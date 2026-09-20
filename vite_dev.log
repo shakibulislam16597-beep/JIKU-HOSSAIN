@@ -12,3 +12,5 @@
 2:57:43 PM [vite] (client) hmr update /src/index.css, /src/components/Header.jsx
 2:58:23 PM [vite] (client) hmr update /src/index.css, /src/components/SearchBar.jsx
 2:59:10 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
+3:04:28 PM [vite] vite.config.js changed, restarting server...
+3:04:28 PM [vite] server restarted.
