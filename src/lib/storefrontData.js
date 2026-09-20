@@ -88,23 +88,31 @@ export async function getStorefrontData() {
   // Attempt Firestore fetch
   try {
     const productsRef = collection(db, 'products');
-    const q = query(productsRef, where('status', '==', 'active'));
-    const productsSnap = await getDocs(q);
-
     let fetchedProducts = [];
-    productsSnap.forEach((docSnap) => {
-      fetchedProducts.push(normalizeProduct(docSnap.data(), docSnap.id));
-    });
 
-    // If query returned no active products, try fetching all products in case status field wasn't set or collection is empty
-    if (fetchedProducts.length === 0) {
-      const allProductsSnap = await getDocs(productsRef);
-      allProductsSnap.forEach((docSnap) => {
-        const data = docSnap.data();
-        if (data.status === 'active' || !data.status) {
-          fetchedProducts.push(normalizeProduct(data, docSnap.id));
-        }
+    try {
+      const q = query(productsRef, where('status', '==', 'active'));
+      const productsSnap = await getDocs(q);
+      productsSnap.forEach((docSnap) => {
+        fetchedProducts.push(normalizeProduct(docSnap.data(), docSnap.id));
       });
+    } catch (activeErr) {
+      console.warn('Active products query error, falling back:', activeErr);
+    }
+
+    // If query returned no active products, try fetching all products as fallback
+    if (fetchedProducts.length === 0) {
+      try {
+        const allProductsSnap = await getDocs(productsRef);
+        allProductsSnap.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.status === 'active' || !data.status) {
+            fetchedProducts.push(normalizeProduct(data, docSnap.id));
+          }
+        });
+      } catch (allErr) {
+        console.warn('All products query fallback error:', allErr);
+      }
     }
 
     // Fetch categories
@@ -178,6 +186,28 @@ export async function getStorefrontData() {
   }
 
   return fallbackPayload;
+}
+
+/**
+ * Safely fetches approved reviews for storefront (using where("status", "==", "approved")) with try/catch fallback.
+ */
+export async function getApprovedReviews(productId) {
+  try {
+    const reviewsRef = collection(db, 'reviews');
+    const q = query(reviewsRef, where('status', '==', 'approved'));
+    const snap = await getDocs(q);
+    const results = [];
+    snap.forEach((docSnap) => {
+      const data = docSnap.data();
+      if (!productId || data.productId === productId) {
+        results.push({ id: docSnap.id, ...data });
+      }
+    });
+    return results;
+  } catch (err) {
+    console.warn('Failed to load approved reviews from Firestore:', err);
+    return [];
+  }
 }
 
 /**
