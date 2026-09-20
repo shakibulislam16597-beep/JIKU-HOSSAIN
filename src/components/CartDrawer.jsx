@@ -1,13 +1,12 @@
 import React from 'react';
-import { WHATSAPP_NUMBER } from '../data/banners';
 import { formatBDT, formatUSD } from '../utils/currency';
-import { X, Trash2, Plus, Minus, ShoppingBag, MessageCircle, ArrowRight } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 
 /**
  * CartDrawer Component - ATOR ALI Store
  *
  * Displays cart items, quantities, dual prices (৳ prominent, $ secondary),
- * and a Checkout button that opens WhatsApp with an itemized order message.
+ * and a Checkout button that opens the Checkout Form Modal.
  */
 export default function CartDrawer({
   isOpen,
@@ -15,27 +14,12 @@ export default function CartDrawer({
   cartItems,
   onUpdateQuantity,
   onRemoveItem,
-  onClearCart
+  onClearCart,
+  onOpenCheckout
 }) {
   if (!isOpen) return null;
 
   const totalUSD = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-  // Construct itemized message for WhatsApp Checkout
-  const buildWhatsAppOrderMessage = () => {
-    let msg = "Assalamu alaikum, I want to order from ATOR ALI:\n\n";
-
-    cartItems.forEach((item, index) => {
-      const sizeStr = item.size ? ` (${item.size})` : '';
-      const lineTotal = formatBDT(item.price * item.quantity);
-      msg += `${index + 1}. ${item.title}${sizeStr} x ${item.quantity} - ${lineTotal}\n`;
-    });
-
-    msg += `\nTotal Amount: ${formatBDT(totalUSD)}\n\nPlease confirm my order details. Thank you!`;
-    return msg;
-  };
-
-  const whatsappCheckoutUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=` + encodeURIComponent(buildWhatsAppOrderMessage());
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -163,17 +147,17 @@ export default function CartDrawer({
             {/* Order Totals Display */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs text-slate-300">
-                <span>Subtotal</span>
+                <span>Items Subtotal</span>
                 <span className="font-semibold text-white">
                   {formatBDT(totalUSD)} ({formatUSD(totalUSD)})
                 </span>
               </div>
               <div className="flex justify-between items-center text-xs text-slate-300">
                 <span>Estimated Shipping</span>
-                <span className="font-semibold text-emerald-400">Calculated on WhatsApp</span>
+                <span className="font-semibold text-emerald-400">Calculated at Checkout</span>
               </div>
               <div className="border-t border-[#D4AF37]/15 pt-2 flex justify-between items-baseline">
-                <span className="text-sm font-bold text-white font-serif">Total Amount</span>
+                <span className="text-sm font-bold text-white font-serif">Subtotal Amount</span>
                 <div className="text-right">
                   <span className="text-xl font-extrabold text-[#D4AF37] block leading-tight">
                     {formatBDT(totalUSD)}
@@ -185,17 +169,15 @@ export default function CartDrawer({
               </div>
             </div>
 
-            {/* WhatsApp Checkout Button */}
-            <a
-              href={whatsappCheckoutUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-full shadow-lg shadow-emerald-900/30 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer text-center"
+            {/* Checkout Button */}
+            <button
+              type="button"
+              onClick={onOpenCheckout}
+              className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 px-6 bg-[#D4AF37] hover:bg-[#E5BF42] text-black font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-full shadow-lg shadow-[#D4AF37]/20 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer text-center"
             >
-              <MessageCircle className="w-5 h-5 fill-white text-emerald-600" />
-              <span>Checkout on WhatsApp</span>
-              <ArrowRight className="w-4 h-4" />
-            </a>
+              <span>Proceed to Checkout</span>
+              <ArrowRight className="w-4 h-4 text-black" />
+            </button>
 
             <button
               type="button"

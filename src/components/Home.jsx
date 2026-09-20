@@ -6,6 +6,8 @@ import FlashSaleStrip from './FlashSaleStrip';
 import PromoBanner from './PromoBanner';
 import WhatsAppBanner from './WhatsAppBanner';
 import CartDrawer from './CartDrawer';
+import CheckoutModal from './CheckoutModal';
+import OrderSuccessModal from './OrderSuccessModal';
 import { MOCK_PRODUCTS } from '../data/products';
 import { formatBDT, formatUSD } from '../utils/currency';
 import {
@@ -23,12 +25,15 @@ import {
 } from 'lucide-react';
 
 /**
- * Home Component - ATOR ALI (Black & Gold Theme with Dual Currency BDT/USD)
+ * Home Component - ATOR ALI (Black & Gold Theme with Dual Currency BDT/USD & Full Checkout)
  */
 export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
   const [activeSearchTerm, setActiveSearchTerm] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+
   const [cartItems, setCartItems] = useState([
     { ...MOCK_PRODUCTS[0], quantity: 1, size: '6ml Pure Oil' },
     { ...MOCK_PRODUCTS[1], quantity: 1, size: '50ml Spray' }
@@ -61,7 +66,14 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
           item.id === prod.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prev, { ...prod, quantity: 1, size: prod.category.includes('Attar') ? '6ml Pure Oil' : '50ml Spray' }];
+      return [
+        ...prev,
+        {
+          ...prod,
+          quantity: 1,
+          size: prod.category.includes('Attar') ? '6ml Pure Oil' : '50ml Spray'
+        }
+      ];
     });
     setIsCartOpen(true);
   };
@@ -82,6 +94,17 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
 
   const handleClearCart = () => {
     setCartItems([]);
+  };
+
+  const handleOpenCheckout = () => {
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
+  };
+
+  const handleSuccessOrder = () => {
+    setIsCheckoutOpen(false);
+    setCartItems([]);
+    setIsSuccessOpen(true);
   };
 
   const searchResults = activeSearchTerm
@@ -116,6 +139,21 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onClearCart={handleClearCart}
+        onOpenCheckout={handleOpenCheckout}
+      />
+
+      {/* Checkout Modal */}
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        cartItems={cartItems}
+        onSuccessOrder={handleSuccessOrder}
+      />
+
+      {/* Order Success Confirmation Screen */}
+      <OrderSuccessModal
+        isOpen={isSuccessOpen}
+        onClose={() => setIsSuccessOpen(false)}
       />
 
       {/* Main Content Area */}
