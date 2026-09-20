@@ -1,6 +1,6 @@
 import heroBannerImg from '../assets/hero-banner.jpg';
 
-export const WHATSAPP_NUMBER = '+8801700000000';
+export const WHATSAPP_NUMBER = "8809638316596";
 
 export const HERO_SLIDES = [
   {

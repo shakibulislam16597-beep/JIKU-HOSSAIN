@@ -5,6 +5,7 @@ import HeroBanner from './HeroBanner';
 import FlashSaleStrip from './FlashSaleStrip';
 import PromoBanner from './PromoBanner';
 import WhatsAppBanner from './WhatsAppBanner';
+import CartDrawer from './CartDrawer';
 import { MOCK_PRODUCTS } from '../data/products';
 import { formatBDT, formatUSD } from '../utils/currency';
 import {
@@ -27,14 +28,14 @@ import {
 export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
   const [activeSearchTerm, setActiveSearchTerm] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([
-    { ...MOCK_PRODUCTS[0], quantity: 1 },
-    { ...MOCK_PRODUCTS[1], quantity: 1 }
+    { ...MOCK_PRODUCTS[0], quantity: 1, size: '6ml Pure Oil' },
+    { ...MOCK_PRODUCTS[1], quantity: 1, size: '50ml Spray' }
   ]);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const cartSubtotalUSD = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const handleSearchSubmit = (term) => {
     setActiveSearchTerm(term);
@@ -60,8 +61,27 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
           item.id === prod.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prev, { ...prod, quantity: 1 }];
+      return [...prev, { ...prod, quantity: 1, size: prod.category.includes('Attar') ? '6ml Pure Oil' : '50ml Spray' }];
     });
+    setIsCartOpen(true);
+  };
+
+  const handleUpdateQuantity = (id, newQty) => {
+    if (newQty <= 0) {
+      handleRemoveItem(id);
+      return;
+    }
+    setCartItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, quantity: newQty } : item))
+    );
+  };
+
+  const handleRemoveItem = (id) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleClearCart = () => {
+    setCartItems([]);
   };
 
   const searchResults = activeSearchTerm
@@ -85,6 +105,17 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
         onToggleDarkMode={onToggleDarkMode}
         onResetSplash={onResetSplash}
         onLogoClick={handleClearSearchResults}
+        onCartClick={() => setIsCartOpen(true)}
+      />
+
+      {/* Cart Drawer Modal */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cartItems}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
+        onClearCart={handleClearCart}
       />
 
       {/* Main Content Area */}
