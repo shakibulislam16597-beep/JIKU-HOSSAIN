@@ -1,5 +1,5 @@
 import React from 'react';
-import { WHATSAPP_BANNER_DATA } from '../data/banners';
+import { WHATSAPP_NUMBER, WHATSAPP_BANNER_DATA } from '../data/banners';
 import { MessageCircle, ArrowUpRight, ShieldCheck } from 'lucide-react';
 
 /**
@@ -8,16 +8,11 @@ import { MessageCircle, ArrowUpRight, ShieldCheck } from 'lucide-react';
  * Requirements:
  * - Positioned above footer
  * - Banner text: "Order on WhatsApp"
- * - Green action button using WHATSAPP_NUMBER constant
+ * - Green action <a> tag with href pointing to https://wa.me/8809638316596?text=...
+ * - target="_blank", rel="noopener noreferrer"
  */
 export default function WhatsAppBanner() {
-  const handleWhatsAppClick = () => {
-    const cleanNumber = WHATSAPP_BANNER_DATA.phoneNumber.replace(/[^0-9]/g, '');
-    const message = encodeURIComponent(
-      'Hello ATOR ALI! I would like to inquire about ordering perfumes and attars.'
-    );
-    window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank', 'noopener,noreferrer');
-  };
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=` + encodeURIComponent("Assalamu alaikum, I want to order from ATOR ALI.");
 
   return (
     <section
@@ -45,18 +40,19 @@ export default function WhatsAppBanner() {
           </div>
         </div>
 
-        {/* Right Green WhatsApp Button */}
+        {/* Right Green WhatsApp Link Button */}
         <div className="shrink-0 w-full md:w-auto">
-          <button
-            type="button"
-            onClick={handleWhatsAppClick}
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             aria-label="Chat and order on WhatsApp"
             className="w-full md:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-full shadow-lg shadow-emerald-900/40 hover:scale-105 active:scale-95 transition-all cursor-pointer"
           >
             <MessageCircle className="w-5 h-5 fill-white text-emerald-600" />
             <span>{WHATSAPP_BANNER_DATA.buttonText}</span>
             <ArrowUpRight className="w-4 h-4" />
-          </button>
+          </a>
         </div>
       </div>
     </section>

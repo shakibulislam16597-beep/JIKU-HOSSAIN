@@ -17,7 +17,8 @@ export default function Header({
   isDarkMode = false,
   onToggleDarkMode,
   onResetSplash,
-  onLogoClick
+  onLogoClick,
+  onCartClick
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -80,6 +81,7 @@ export default function Header({
           <div className="flex items-center gap-1">
             <button
               type="button"
+              onClick={onCartClick}
               aria-label={`Shopping Cart, ${cartCount} items`}
               className="relative p-2.5 rounded-full text-[#E5D7B5] hover:text-[#D4AF37] hover:bg-[#1A1812] focus:outline-none focus:ring-2 focus:ring-[#D4AF37] transition-colors cursor-pointer"
             >
@@ -127,7 +129,7 @@ export default function Header({
                   type="button"
                   onClick={() => setIsMenuOpen(false)}
                   aria-label="Close menu"
-                  className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-[#252014] transition-colors"
+                  className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-[#252014] transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -168,7 +170,7 @@ export default function Header({
                   <button
                     type="button"
                     onClick={() => setIsMenuOpen(false)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-[#1A1812] hover:text-[#D4AF37] transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-[#1A1812] hover:text-[#D4AF37] transition-colors text-left cursor-pointer"
                   >
                     <User className="w-4 h-4 text-[#D4AF37]" />
                     <span>My Account & Orders</span>
@@ -176,7 +178,7 @@ export default function Header({
                   <button
                     type="button"
                     onClick={() => setIsMenuOpen(false)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-[#1A1812] hover:text-[#D4AF37] transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-[#1A1812] hover:text-[#D4AF37] transition-colors text-left cursor-pointer"
                   >
                     <Heart className="w-4 h-4 text-rose-400" />
                     <span>Saved Wishlist (4)</span>
@@ -184,7 +186,7 @@ export default function Header({
                   <button
                     type="button"
                     onClick={() => setIsMenuOpen(false)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-[#1A1812] hover:text-[#D4AF37] transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-[#1A1812] hover:text-[#D4AF37] transition-colors text-left cursor-pointer"
                   >
                     <Package className="w-4 h-4 text-emerald-400" />
                     <span>Track Order Delivery</span>

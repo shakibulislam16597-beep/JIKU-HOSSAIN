@@ -16,3 +16,7 @@
 3:04:28 PM [vite] server restarted.
 4:04:19 PM [vite] (client) hmr update /src/index.css, /src/components/HeroBanner.jsx
 4:05:14 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
+4:22:43 PM [vite] (client) hmr update /src/index.css, /src/components/HeroBanner.jsx, /src/components/FlashSaleStrip.jsx, /src/components/WhatsAppBanner.jsx, /src/components/PromoBanner.jsx
+4:23:02 PM [vite] (client) hmr update /src/index.css, /src/components/WhatsAppBanner.jsx
+4:23:43 PM [vite] (client) hmr update /src/index.css, /src/components/Header.jsx
+4:24:09 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
