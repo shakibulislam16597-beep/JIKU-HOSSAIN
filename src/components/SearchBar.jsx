@@ -1,22 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Camera, X, History, Trash2, ArrowRight, Tag, Star, AlertCircle } from 'lucide-react';
 import { MOCK_PRODUCTS, INITIAL_RECENT_SEARCHES } from '../data/products';
+import { formatBDT } from '../utils/currency';
 
 /**
- * SearchBar Component - ATOR ALI (Black & Gold Theme)
- *
- * Requirements:
- * - Large rounded search bar matching black & gold theme
- * - Left search icon, placeholder, camera icon on right, clear (X) button
- * - Live suggestions dropdown while typing (debounced 300ms)
- * - "Recent searches" list with delete options when focused
- * - Pressing Enter shows search results view
- * - Full keyboard navigation & accessibility
+ * SearchBar Component - ATOR ALI (Clean White Modern Theme)
  */
-export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
+export default function SearchBar({ onSearchSubmit, onSelectProduct, autoFocus = false }) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(autoFocus);
   const [recentSearches, setRecentSearches] = useState(INITIAL_RECENT_SEARCHES);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [cameraModalOpen, setCameraModalOpen] = useState(false);
@@ -24,23 +17,25 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
   const containerRef = useRef(null);
   const inputRef = useRef(null);
 
+  useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [autoFocus]);
+
   // Debounce input by 300ms
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedQuery(query.trim());
     }, 300);
 
-    return () => {
-      clearTimeout(handler);
-    };
+    return () => clearTimeout(handler);
   }, [query]);
 
-  // Reset selected index when query changes
   useEffect(() => {
     setSelectedIndex(-1);
   }, [debouncedQuery]);
 
-  // Handle outside click to close dropdown
   useEffect(() => {
     function handleClickOutside(event) {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -48,12 +43,9 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter live product suggestions
   const suggestions = debouncedQuery.length > 0
     ? MOCK_PRODUCTS.filter((prod) =>
         prod.title.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
@@ -80,11 +72,6 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
   const handleRemoveRecent = (e, indexToRemove) => {
     e.stopPropagation();
     setRecentSearches((prev) => prev.filter((_, idx) => idx !== indexToRemove));
-  };
-
-  const handleClearAllRecent = (e) => {
-    e.stopPropagation();
-    setRecentSearches([]);
   };
 
   const executeSearch = (searchTerm) => {
@@ -139,17 +126,17 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-2xl mx-auto my-3 px-1 sm:px-0">
+    <div ref={containerRef} className="relative w-full max-w-2xl mx-auto my-2 px-1">
       {/* Search Bar Input Container */}
       <div
-        className={`relative flex items-center w-full rounded-2xl border transition-all duration-200 shadow-md ${
+        className={`relative flex items-center w-full rounded-2xl border transition-all duration-200 bg-gray-50 ${
           isFocused
-            ? 'border-[#D4AF37] ring-2 ring-[#D4AF37]/30 bg-[#14120C]'
-            : 'border-[#D4AF37]/30 bg-[#14120C]/80 hover:border-[#D4AF37]/60'
+            ? 'border-black ring-2 ring-black/10 bg-white shadow-md'
+            : 'border-gray-200 hover:border-gray-300'
         }`}
       >
         {/* Left Search Icon */}
-        <div className="pl-4 text-[#D4AF37] flex items-center justify-center">
+        <div className="pl-4 text-gray-500 flex items-center justify-center">
           <Search className="w-5 h-5" />
         </div>
 
@@ -166,17 +153,17 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
           aria-expanded={showRecentSearches || showSuggestions}
           aria-autocomplete="list"
           role="combobox"
-          className="w-full py-3.5 pl-3 pr-2 text-sm sm:text-base text-white placeholder-slate-400 focus:outline-none font-medium bg-transparent"
+          className="w-full py-3 pl-3 pr-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden font-medium bg-transparent"
         />
 
         {/* Right Actions */}
-        <div className="pr-3 flex items-center gap-1.5">
+        <div className="pr-3 flex items-center gap-1">
           {query.length > 0 && (
             <button
               type="button"
               onClick={handleClear}
               aria-label="Clear search input"
-              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-[#252014] transition-colors cursor-pointer"
+              className="p-1 rounded-full text-gray-400 hover:text-black hover:bg-gray-200 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -187,7 +174,7 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
             onClick={() => setCameraModalOpen(true)}
             aria-label="Search by image camera"
             title="Search by image"
-            className="p-2 rounded-xl text-[#D4AF37] hover:bg-[#D4AF37]/20 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-gray-600 hover:text-black hover:bg-gray-200 transition-colors cursor-pointer"
           >
             <Camera className="w-5 h-5" />
           </button>
@@ -199,20 +186,20 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
         <div
           role="listbox"
           aria-label="Search suggestions"
-          className="absolute left-0 right-0 top-full mt-2 bg-[#0B0B0B] rounded-2xl border border-[#D4AF37]/30 shadow-2xl overflow-hidden z-50 animate-in fade-in-50 duration-150 text-[#E5D7B5]"
+          className="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden z-50 animate-in fade-in duration-150 text-gray-900"
         >
           {/* RECENT SEARCHES */}
           {showRecentSearches && (
             <div className="p-3">
-              <div className="flex items-center justify-between px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#D4AF37]">
+              <div className="flex items-center justify-between px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-gray-400">
                 <span className="flex items-center gap-1.5">
-                  <History className="w-3.5 h-3.5" /> Recent Searches
+                  <History className="w-3.5 h-3.5 text-gray-500" /> Recent Searches
                 </span>
                 {recentSearches.length > 0 && (
                   <button
                     type="button"
-                    onClick={handleClearAllRecent}
-                    className="text-[11px] text-[#D4AF37] hover:underline cursor-pointer"
+                    onClick={() => setRecentSearches([])}
+                    className="text-[11px] text-gray-500 hover:text-black hover:underline cursor-pointer"
                   >
                     Clear All
                   </button>
@@ -232,21 +219,23 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
                           setQuery(item);
                           executeSearch(item);
                         }}
-                        className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-colors cursor-pointer ${
+                        className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm transition-colors cursor-pointer ${
                           isSelected
-                            ? 'bg-[#D4AF37]/20 text-[#D4AF37] font-semibold border border-[#D4AF37]/40'
-                            : 'text-slate-200 hover:bg-[#1A1812]'
+                            ? 'bg-black text-white font-semibold'
+                            : 'text-gray-800 hover:bg-gray-100'
                         }`}
                       >
                         <div className="flex items-center gap-2.5 truncate pr-2">
-                          <History className="w-4 h-4 text-[#D4AF37]/70 shrink-0" />
+                          <History className={`w-4 h-4 shrink-0 ${isSelected ? 'text-white' : 'text-gray-400'}`} />
                           <span className="truncate">{item}</span>
                         </div>
                         <button
                           type="button"
                           onClick={(e) => handleRemoveRecent(e, idx)}
                           aria-label={`Remove ${item} from recent searches`}
-                          className="p-1 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-[#252014] transition-colors"
+                          className={`p-1 rounded-lg transition-colors ${
+                            isSelected ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-200 text-gray-400'
+                          }`}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -255,7 +244,7 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
                   })}
                 </div>
               ) : (
-                <div className="py-6 text-center text-xs text-slate-400">
+                <div className="py-4 text-center text-xs text-gray-400">
                   No recent searches
                 </div>
               )}
@@ -265,10 +254,10 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
           {/* LIVE SUGGESTIONS */}
           {showSuggestions && (
             <div className="p-3">
-              <div className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#D4AF37] flex items-center justify-between">
-                <span>Products ({suggestions.length})</span>
+              <div className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-gray-400 flex items-center justify-between">
+                <span>Matching Products ({suggestions.length})</span>
                 {debouncedQuery.length > 0 && query !== debouncedQuery && (
-                  <span className="text-[10px] text-[#D4AF37] animate-pulse">Searching...</span>
+                  <span className="text-[10px] text-gray-500 animate-pulse">Searching...</span>
                 )}
               </div>
 
@@ -291,60 +280,51 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
                         }}
                         className={`flex items-center gap-3 p-2 rounded-xl transition-colors cursor-pointer ${
                           isSelected
-                            ? 'bg-[#D4AF37]/20 ring-1 ring-[#D4AF37]'
-                            : 'hover:bg-[#1A1812]'
+                            ? 'bg-gray-100 ring-1 ring-black'
+                            : 'hover:bg-gray-50'
                         }`}
                       >
-                        <div className="relative w-12 h-12 rounded-lg bg-[#14120C] overflow-hidden shrink-0 border border-[#D4AF37]/30">
+                        <div className="relative w-12 h-12 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-200">
                           <img
                             src={prod.image}
                             alt={prod.title}
-                            className="w-full h-full object-cover object-center"
+                            className="w-full h-full object-cover"
                           />
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <div className="text-[11px] font-semibold text-[#D4AF37] flex items-center gap-1">
+                          <div className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1">
                             <Tag className="w-3 h-3" />
                             <span>{prod.category}</span>
                           </div>
-                          <div className="text-sm font-bold text-white truncate">
+                          <div className="text-xs font-bold text-gray-900 truncate">
                             {prod.title}
                           </div>
-                          <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                            <span className="font-bold text-[#F5E8C7]">
-                              ${prod.price.toFixed(2)}
+                          <div className="flex items-center gap-2 text-xs mt-0.5">
+                            <span className="font-extrabold text-black">
+                              {formatBDT(prod.price)}
                             </span>
-                            <span>•</span>
-                            <span className="flex items-center text-[#D4AF37] font-medium">
-                              <Star className="w-3 h-3 fill-[#D4AF37] text-[#D4AF37] mr-0.5" />
-                              {prod.rating}
-                            </span>
+                            {prod.oldPrice && (
+                              <span className="line-through text-gray-400 text-[11px]">
+                                {formatBDT(prod.oldPrice)}
+                              </span>
+                            )}
                           </div>
                         </div>
 
-                        <ArrowRight className="w-4 h-4 text-[#D4AF37] shrink-0 pr-1" />
+                        <ArrowRight className="w-4 h-4 text-gray-400 shrink-0" />
                       </div>
                     );
                   })}
-
-                  <button
-                    type="button"
-                    onClick={() => executeSearch(query)}
-                    className="w-full mt-2 pt-2 border-t border-[#D4AF37]/20 flex items-center justify-center gap-2 text-xs font-semibold text-[#D4AF37] hover:underline"
-                  >
-                    <span>View all results for "{query}"</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
                 </div>
               ) : (
-                <div className="py-8 text-center px-4">
-                  <AlertCircle className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-white">
+                <div className="py-6 text-center px-4">
+                  <AlertCircle className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm font-bold text-gray-800">
                     No matching products found
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Try searching for "Oud", "Musk", or "Perfume"
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Try searching for "Oud", "Musk", or "Attar"
                   </p>
                 </div>
               )}
@@ -355,25 +335,25 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
 
       {/* Camera Search Modal */}
       {cameraModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-[#0B0B0B] rounded-2xl max-w-sm w-full p-6 text-center border border-[#D4AF37]/40 shadow-2xl relative text-[#E5D7B5]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 text-center border border-gray-100 shadow-2xl relative">
             <button
               type="button"
               onClick={() => setCameraModalOpen(false)}
-              className="absolute top-3 right-3 p-1.5 rounded-full text-slate-400 hover:text-white"
+              className="absolute top-3 right-3 p-1.5 rounded-full text-gray-400 hover:text-black hover:bg-gray-100"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="w-16 h-16 bg-[#D4AF37]/20 rounded-2xl flex items-center justify-center text-[#D4AF37] border border-[#D4AF37]/30 mx-auto mb-4">
+            <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center text-black mx-auto mb-4 border border-gray-200">
               <Camera className="w-8 h-8" />
             </div>
 
-            <h3 className="text-lg font-extrabold font-serif text-white mb-2">
+            <h3 className="text-lg font-bold text-gray-900 mb-1">
               Visual Scent Search
             </h3>
-            <p className="text-xs text-slate-400 mb-6">
-              Take or upload a photo of any attar bottle or perfume to instantly locate matching fragrances in ATOR ALI store.
+            <p className="text-xs text-gray-500 mb-6">
+              Take or upload a photo of any perfume bottle to instantly find matching products in ATOR ALI store.
             </p>
 
             <div className="space-y-2">
@@ -381,17 +361,16 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct }) {
                 type="button"
                 onClick={() => {
                   setCameraModalOpen(false);
-                  setQuery('Oud');
                   executeSearch('Oud');
                 }}
-                className="w-full py-2.5 px-4 bg-[#D4AF37] hover:bg-[#E5BF42] text-black rounded-xl text-sm font-extrabold transition-colors cursor-pointer uppercase"
+                className="w-full py-2.5 px-4 bg-black text-white rounded-xl text-sm font-bold hover:bg-gray-800 transition-colors cursor-pointer uppercase"
               >
                 Upload Photo Sample
               </button>
               <button
                 type="button"
                 onClick={() => setCameraModalOpen(false)}
-                className="w-full py-2.5 px-4 bg-[#14120C] text-slate-300 rounded-xl text-sm font-medium hover:bg-[#1A1812] transition-colors"
+                className="w-full py-2.5 px-4 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>

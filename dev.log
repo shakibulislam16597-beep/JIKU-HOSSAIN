@@ -1,0 +1,11 @@
+
+> ator-ali-ecommerce@1.0.0 dev
+> vite
+
+Port 3000 is in use, trying another one...
+5:20:31 PM [vite] (client) Re-optimizing dependencies because lockfile has changed
+
+  VITE v8.3.0  ready in 542 ms
+
+  ➜  Local:   http://localhost:3001/
+  ➜  Network: http://192.168.0.2:3001/  eth0
