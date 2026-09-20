@@ -20,3 +20,6 @@
 4:23:02 PM [vite] (client) hmr update /src/index.css, /src/components/WhatsAppBanner.jsx
 4:23:43 PM [vite] (client) hmr update /src/index.css, /src/components/Header.jsx
 4:24:09 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
+4:58:48 PM [vite] (client) hmr update /src/index.css, /src/components/HeroBanner.jsx, /src/components/FlashSaleStrip.jsx, /src/components/WhatsAppBanner.jsx, /src/components/PromoBanner.jsx, /src/components/CartDrawer.jsx
+5:00:07 PM [vite] (client) hmr update /src/index.css, /src/components/CartDrawer.jsx
+5:00:36 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
