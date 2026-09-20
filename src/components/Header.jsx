@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Menu, Search, X, Package, Phone } from 'lucide-react';
+import { Menu, Search, X, Package, Phone, Lock, ShieldCheck, MessageCircle } from 'lucide-react';
 import AnnouncementBar from './AnnouncementBar';
+import { WHATSAPP_NUMBER } from '../config';
 
 /**
  * Header Component - Extrovat Lifestyle
@@ -11,7 +12,8 @@ export default function Header({
   onCartClick,
   onToggleSearch,
   isSearchOpen,
-  onOpenTrackOrder
+  onOpenTrackOrder,
+  isAdmin = false
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -158,6 +160,58 @@ export default function Header({
                   );
                 })}
               </nav>
+
+              {/* Call, WhatsApp & Staff Login/Admin Section */}
+              <div className="p-4 pt-1 space-y-2 border-t border-[#0E1330]/10">
+                <div className="grid grid-cols-2 gap-2">
+                  <a
+                    href="tel:+8809638316596"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-[#FFFFFF] border-2 border-[#0E1330] rounded-xl font-heading font-bold text-xs text-[#0E1330] shadow-[2px_2px_0px_#0E1330] hover:bg-[#F7F8FC] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                  >
+                    <Phone className="w-4 h-4 text-[#2436F5]" />
+                    <span>Call Store</span>
+                  </a>
+
+                  <a
+                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("I want to order from Extrovat Lifestyle")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-[#25D366] border-2 border-[#0E1330] rounded-xl font-heading font-bold text-xs text-[#0E1330] shadow-[2px_2px_0px_#0E1330] hover:bg-[#22bf5b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                  >
+                    <MessageCircle className="w-4 h-4 text-[#0E1330]" />
+                    <span>WhatsApp</span>
+                  </a>
+                </div>
+
+                {/* Staff Login / Admin Panel Button */}
+                {isAdmin ? (
+                  <a
+                    href="#/admin"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 bg-[#FFC933] border-2 border-[#0E1330] rounded-xl font-heading font-bold text-xs text-[#0E1330] shadow-[2px_2px_0px_#0E1330] hover:bg-[#f0ba28] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-[#0E1330]" />
+                      <span>Admin panel</span>
+                    </div>
+                    <span className="font-sans font-bold">→</span>
+                  </a>
+                ) : (
+                  <a
+                    href="#/admin/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full flex items-center justify-between px-3.5 py-2.5 bg-[#FFFFFF] border-2 border-[#0E1330] rounded-xl font-heading font-bold text-xs text-[#0E1330] shadow-[2px_2px_0px_#0E1330] hover:bg-[#2436F5] hover:text-[#FFFFFF] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-[#2436F5] group-hover:text-[#FFFFFF]" />
+                      <span>Staff login</span>
+                    </div>
+                    <span className="font-sans font-bold">→</span>
+                  </a>
+                )}
+              </div>
             </div>
 
             {/* Bottom Opacity Watermark */}

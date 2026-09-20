@@ -11,27 +11,24 @@ import { formatBDT } from '../utils/currency';
  * - 2px ink border and hard offset shadow
  */
 export default function FloatingCart({ itemCount = 0, totalAmount = 0, onClick }) {
+  if (itemCount === 0) return null;
+
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={`Floating Cart with ${itemCount} items totaling ${formatBDT(totalAmount)}`}
-      className="fixed right-0 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center rounded-l-2xl border-2 border-r-0 border-[#0E1330] shadow-[-3px_3px_0px_#0E1330] overflow-hidden cursor-pointer transition-transform active:translate-x-[2px] focus:outline-none"
+      className="fixed bottom-20 right-4 z-40 flex items-center gap-2 px-3.5 py-2 bg-[#0E1330] text-[#FFFFFF] border-2 border-[#0E1330] rounded-full shadow-[3px_3px_0px_#FFC933] hover:bg-[#2436F5] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer focus:outline-none"
     >
-      {/* Top Ink Segment with Sun-Yellow Icon */}
-      <div className="bg-[#0E1330] text-[#FFFFFF] px-3.5 py-2.5 flex flex-col items-center w-full min-w-[68px]">
-        <ShoppingBag className="w-5 h-5 text-[#FFC933] mb-0.5" />
-        <span className="text-[10px] font-heading font-extrabold whitespace-nowrap text-[#FFC933]">
-          {itemCount} {itemCount === 1 ? 'item' : 'items'}
+      <div className="relative flex items-center justify-center">
+        <ShoppingBag className="w-4 h-4 text-[#FFC933]" />
+        <span className="absolute -top-1.5 -right-2 bg-[#FFC933] text-[#0E1330] border border-[#0E1330] text-[9px] font-heading font-extrabold rounded-full px-1 min-w-[15px] h-[15px] flex items-center justify-center leading-none">
+          {itemCount > 99 ? '99+' : itemCount}
         </span>
       </div>
-
-      {/* Bottom White Segment */}
-      <div className="bg-[#FFFFFF] text-[#0E1330] px-3 py-1.5 flex items-center justify-center w-full border-t-2 border-[#0E1330]">
-        <span className="text-xs font-sans font-extrabold text-[#0E1330] whitespace-nowrap">
-          {formatBDT(totalAmount)}
-        </span>
-      </div>
+      <span className="text-xs font-sans font-extrabold text-[#FFFFFF] pl-1">
+        {formatBDT(totalAmount)}
+      </span>
     </button>
   );
 }

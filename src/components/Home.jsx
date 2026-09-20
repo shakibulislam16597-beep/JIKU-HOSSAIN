@@ -24,7 +24,7 @@ import { X, ArrowLeft, Grid, LogIn, ArrowUp, SlidersHorizontal } from 'lucide-re
 /**
  * Home Component - Extrovat Lifestyle
  */
-export default function Home({ onResetSplash }) {
+export default function Home({ onResetSplash, isAdmin = false }) {
   const [activeTab, setActiveTab] = useState('home');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeSearchTerm, setActiveSearchTerm] = useState(null);
@@ -243,6 +243,7 @@ export default function Home({ onResetSplash }) {
         onToggleSearch={() => setIsSearchOpen((prev) => !prev)}
         isSearchOpen={isSearchOpen}
         onOpenTrackOrder={() => setIsTrackOrderOpen(true)}
+        isAdmin={isAdmin}
       />
 
       {/* Floating Cart Widget on Right Edge */}
@@ -577,7 +578,7 @@ export default function Home({ onResetSplash }) {
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Back to top"
-          className="fixed bottom-20 right-4 z-40 p-3 bg-[#FFFFFF] text-[#0E1330] hover:bg-[#FFC933] rounded-full border-2 border-[#0E1330] shadow-[3px_3px_0px_#0E1330] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer animate-in fade-in"
+          className="fixed bottom-20 left-4 z-40 p-3 bg-[#FFFFFF] text-[#0E1330] hover:bg-[#FFC933] rounded-full border-2 border-[#0E1330] shadow-[3px_3px_0px_#0E1330] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer animate-in fade-in"
         >
           <ArrowUp className="w-5 h-5 text-[#0E1330]" />
         </button>
