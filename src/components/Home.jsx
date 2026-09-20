@@ -2,38 +2,39 @@ import React, { useState } from 'react';
 import Header from './Header';
 import SearchBar from './SearchBar';
 import HeroBanner from './HeroBanner';
+import FlashSaleStrip from './FlashSaleStrip';
+import PromoBanner from './PromoBanner';
+import WhatsAppBanner from './WhatsAppBanner';
 import { MOCK_PRODUCTS } from '../data/products';
+import { formatBDT, formatUSD } from '../utils/currency';
 import {
   Star,
   ShoppingBag,
   ArrowLeft,
   Filter,
   SlidersHorizontal,
-  Sparkles,
   ShieldCheck,
   Truck,
   RotateCcw,
   Heart,
-  ChevronRight,
   Eye,
   X
 } from 'lucide-react';
 
 /**
- * Home Component - ATOR ALI (Black & Gold Theme)
- *
- * Coordinates:
- * - Sticky Header
- * - SearchBar with live suggestions & debouncing
- * - HeroBanner placed directly below SearchBar
- * - Search results page placeholder
- * - Luxury Featured Catalog & quick view modal
+ * Home Component - ATOR ALI (Black & Gold Theme with Dual Currency BDT/USD)
  */
 export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
   const [activeSearchTerm, setActiveSearchTerm] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [cartCount, setCartCount] = useState(3);
+  const [cartItems, setCartItems] = useState([
+    { ...MOCK_PRODUCTS[0], quantity: 1 },
+    { ...MOCK_PRODUCTS[1], quantity: 1 }
+  ]);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
+
+  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const cartSubtotalUSD = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const handleSearchSubmit = (term) => {
     setActiveSearchTerm(term);
@@ -51,8 +52,16 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
   };
 
   const handleAddToCart = (e, prod) => {
-    e.stopPropagation();
-    setCartCount((prev) => prev + 1);
+    if (e && e.stopPropagation) e.stopPropagation();
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.id === prod.id);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === prod.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prev, { ...prod, quantity: 1 }];
+    });
   };
 
   const searchResults = activeSearchTerm
@@ -64,8 +73,11 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
       )
     : [];
 
+  const firstGroupProducts = MOCK_PRODUCTS.slice(0, 4);
+  const secondGroupProducts = MOCK_PRODUCTS.slice(4);
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0B0B] text-white transition-colors duration-200 pb-16 selection:bg-[#D4AF37] selection:text-black">
+    <div className="min-h-screen flex flex-col bg-[#0B0B0B] text-white transition-colors duration-200 pb-12 selection:bg-[#D4AF37] selection:text-black">
       {/* Sticky Header */}
       <Header
         cartCount={cartCount}
@@ -142,16 +154,22 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
                     <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                       {selectedProduct.description}
                     </p>
-                    <div className="flex items-center gap-4 pt-2">
-                      <span className="text-2xl font-bold text-[#D4AF37]">
-                        ${selectedProduct.price.toFixed(2)}
+
+                    {/* Dual Currency Display */}
+                    <div className="flex flex-wrap items-baseline gap-2 pt-2">
+                      <span className="text-3xl font-extrabold text-[#D4AF37]">
+                        {formatBDT(selectedProduct.price)}
+                      </span>
+                      <span className="text-sm font-semibold text-slate-300">
+                        ({formatUSD(selectedProduct.price)})
                       </span>
                       {selectedProduct.originalPrice && (
-                        <span className="text-sm line-through text-slate-500">
-                          ${selectedProduct.originalPrice.toFixed(2)}
+                        <span className="text-xs line-through text-slate-500 ml-2">
+                          {formatUSD(selectedProduct.originalPrice)} · {formatBDT(selectedProduct.originalPrice)}
                         </span>
                       )}
                     </div>
+
                     <div className="pt-3 flex flex-wrap items-center gap-3">
                       <button
                         type="button"
@@ -209,11 +227,13 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
         ) : (
           /* STORE FRONT CONTENT */
           <div className="space-y-6">
-            {/* HERO BANNER (placed directly below search bar) */}
-            <HeroBanner onShopNowClick={() => {
-              const catalogElem = document.getElementById('catalog');
-              if (catalogElem) catalogElem.scrollIntoView({ behavior: 'smooth' });
-            }} />
+            {/* HERO CAROUSEL BANNER */}
+            <HeroBanner
+              onShopNowClick={() => {
+                const catalogElem = document.getElementById('catalog');
+                if (catalogElem) catalogElem.scrollIntoView({ behavior: 'smooth' });
+              }}
+            />
 
             {/* Category Badges horizontal scroll */}
             <section aria-label="Product Categories" className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
@@ -231,6 +251,14 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
                 </button>
               ))}
             </section>
+
+            {/* FLASH SALE STRIP (below categories) */}
+            <FlashSaleStrip
+              onExploreSale={() => {
+                const catalogElem = document.getElementById('catalog');
+                if (catalogElem) catalogElem.scrollIntoView({ behavior: 'smooth' });
+              }}
+            />
 
             {/* Trust Badges */}
             <section aria-label="Store Guarantees" className="grid grid-cols-3 gap-3 bg-[#14120C] p-4 rounded-2xl border border-[#D4AF37]/20 text-center text-xs">
@@ -264,8 +292,29 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
                 </span>
               </div>
 
+              {/* First 2 Rows of Products (4 items) */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                {MOCK_PRODUCTS.map((product) => (
+                {firstGroupProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onAddToCart={(e) => handleAddToCart(e, product)}
+                    onQuickView={() => setQuickViewProduct(product)}
+                  />
+                ))}
+              </div>
+
+              {/* PROMO BANNER (between 2nd and 3rd product rows) */}
+              <PromoBanner
+                onPromoClick={() => {
+                  const catalogElem = document.getElementById('catalog');
+                  if (catalogElem) catalogElem.scrollIntoView({ behavior: 'smooth' });
+                }}
+              />
+
+              {/* Remaining Product Rows */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                {secondGroupProducts.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
@@ -275,6 +324,9 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
                 ))}
               </div>
             </section>
+
+            {/* WHATSAPP BANNER (above footer) */}
+            <WhatsAppBanner />
           </div>
         )}
       </main>
@@ -287,7 +339,7 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
               type="button"
               onClick={() => setQuickViewProduct(null)}
               aria-label="Close product view"
-              className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white bg-[#1C180E] border border-[#D4AF37]/20"
+              className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white bg-[#1C180E] border border-[#D4AF37]/20 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -312,13 +364,17 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
                   {quickViewProduct.description}
                 </p>
 
-                <div className="flex items-center gap-2 pt-1">
-                  <span className="text-xl font-bold text-[#D4AF37]">
-                    ${quickViewProduct.price.toFixed(2)}
+                {/* Dual Currency Price Display */}
+                <div className="flex flex-wrap items-baseline gap-2 pt-2">
+                  <span className="text-2xl font-extrabold text-[#D4AF37]">
+                    {formatBDT(quickViewProduct.price)}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-300">
+                    ({formatUSD(quickViewProduct.price)})
                   </span>
                   {quickViewProduct.originalPrice && (
-                    <span className="text-xs line-through text-slate-500">
-                      ${quickViewProduct.originalPrice.toFixed(2)}
+                    <span className="text-xs line-through text-slate-500 block">
+                      {formatUSD(quickViewProduct.originalPrice)} · {formatBDT(quickViewProduct.originalPrice)}
                     </span>
                   )}
                 </div>
@@ -344,7 +400,7 @@ export default function Home({ isDarkMode, onToggleDarkMode, onResetSplash }) {
   );
 }
 
-/** Product Card Subcomponent */
+/** Product Card Subcomponent with Dual Currency Display */
 function ProductCard({ product, onAddToCart, onQuickView }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
 
@@ -408,20 +464,24 @@ function ProductCard({ product, onAddToCart, onQuickView }) {
           </h3>
         </div>
 
-        <div className="mt-3 pt-2 border-t border-[#D4AF37]/15 flex items-center justify-between">
-          <div>
-            <div className="text-xs sm:text-sm font-extrabold text-[#F5E8C7]">
-              ${product.price.toFixed(2)}
-            </div>
+        <div className="mt-3 pt-2 border-t border-[#D4AF37]/15 flex items-center justify-between gap-1">
+          {/* Dual Currency Price (BDT prominent gold, USD smaller) */}
+          <div className="flex flex-col">
+            <span className="text-xs sm:text-sm font-extrabold text-[#D4AF37] leading-tight">
+              {formatBDT(product.price)}
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium">
+              {formatUSD(product.price)}
+            </span>
             {product.originalPrice && (
-              <div className="text-[10px] line-through text-slate-500">
-                ${product.originalPrice.toFixed(2)}
-              </div>
+              <span className="text-[9px] line-through text-slate-500 mt-0.5">
+                {formatUSD(product.originalPrice)} · {formatBDT(product.originalPrice)}
+              </span>
             )}
           </div>
 
-          <div className="flex items-center gap-1">
-            <div className="flex items-center text-[11px] text-[#D4AF37] font-bold mr-1">
+          <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center text-[11px] text-[#D4AF37] font-bold mr-0.5">
               <Star className="w-3 h-3 fill-[#D4AF37] text-[#D4AF37] mr-0.5" />
               {product.rating}
             </div>
