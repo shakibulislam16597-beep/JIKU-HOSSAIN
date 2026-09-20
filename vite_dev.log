@@ -3,36 +3,7 @@
 > vite
 
 
-  VITE v8.3.0  ready in 385 ms
+  VITE v8.3.0  ready in 371 ms
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: http://192.168.0.2:3000/  eth0
-2:57:05 PM [vite] (client) hmr update /src/index.css
-2:57:10 PM [vite] (client) hmr update /src/components/SplashScreen.jsx, /src/index.css
-2:57:43 PM [vite] (client) hmr update /src/index.css, /src/components/Header.jsx
-2:58:23 PM [vite] (client) hmr update /src/index.css, /src/components/SearchBar.jsx
-2:59:10 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
-3:04:28 PM [vite] vite.config.js changed, restarting server...
-3:04:28 PM [vite] server restarted.
-4:04:19 PM [vite] (client) hmr update /src/index.css, /src/components/HeroBanner.jsx
-4:05:14 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
-4:22:43 PM [vite] (client) hmr update /src/index.css, /src/components/HeroBanner.jsx, /src/components/FlashSaleStrip.jsx, /src/components/WhatsAppBanner.jsx, /src/components/PromoBanner.jsx
-4:23:02 PM [vite] (client) hmr update /src/index.css, /src/components/WhatsAppBanner.jsx
-4:23:43 PM [vite] (client) hmr update /src/index.css, /src/components/Header.jsx
-4:24:09 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
-4:58:48 PM [vite] (client) hmr update /src/index.css, /src/components/HeroBanner.jsx, /src/components/FlashSaleStrip.jsx, /src/components/WhatsAppBanner.jsx, /src/components/PromoBanner.jsx, /src/components/CartDrawer.jsx
-5:00:07 PM [vite] (client) hmr update /src/index.css, /src/components/CartDrawer.jsx
-5:00:36 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
-5:15:57 PM [vite] (client) page reload src/main.jsx
-5:16:05 PM [vite] (client) hmr update /src/index.css
-5:16:05 PM [vite] (client) hmr update /src/index.css
-5:16:39 PM [vite] (client) hmr update /src/index.css, /src/components/Home.jsx, /src/components/CartDrawer.jsx, /src/components/CheckoutModal.jsx
-5:16:50 PM [vite] (client) hmr update /src/index.css, /src/components/Home.jsx, /src/components/SearchBar.jsx
-5:17:18 PM [vite] (client) hmr update /src/index.css, /src/components/Header.jsx
-5:17:35 PM [vite] (client) hmr update /src/index.css, /src/components/SearchBar.jsx
-5:18:11 PM [vite] (client) hmr update /src/index.css, /src/components/HeroBanner.jsx
-5:18:46 PM [vite] (client) hmr update /src/index.css, /src/components/CartDrawer.jsx
-5:19:11 PM [vite] (client) hmr update /src/index.css, /src/components/CheckoutModal.jsx
-5:19:16 PM [vite] (client) hmr update /src/index.css, /src/components/OrderSuccessModal.jsx
-5:19:47 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
-5:20:00 PM [vite] (client) hmr update /src/index.css, /src/components/WhatsAppBanner.jsx
