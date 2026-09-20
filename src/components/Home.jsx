@@ -19,10 +19,10 @@ import InstallPrompt from './InstallPrompt';
 
 import { MOCK_PRODUCTS } from '../data/products';
 import { safeGetItem, safeSetItem } from '../utils/storage';
-import { X, ArrowLeft, Grid, User, LogIn, ArrowUp, SlidersHorizontal, Sparkles } from 'lucide-react';
+import { X, ArrowLeft, Grid, LogIn, ArrowUp, SlidersHorizontal } from 'lucide-react';
 
 /**
- * Home Component - ATOR ALI (Clean White Modern Theme)
+ * Home Component - Extrovat Lifestyle
  */
 export default function Home({ onResetSplash }) {
   const [activeTab, setActiveTab] = useState('home');
@@ -45,12 +45,16 @@ export default function Home({ onResetSplash }) {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [sortBy, setSortBy] = useState('popular');
 
-  // Available categories list
+  // Updated Category Names
   const categoriesList = [
-    'NEW ARRIVALS',
-    'PREMIUM PERFUME OIL',
-    'ATTAR COLLECTION',
-    'COMBO OFFERS'
+    'Attar',
+    'Perfume',
+    'Body Spray',
+    'Oud & Agarwood',
+    'Gift Sets',
+    'Lifestyle',
+    'Combo Offers',
+    'Under ৳999'
   ];
 
   // Recently Viewed state
@@ -59,7 +63,7 @@ export default function Home({ onResetSplash }) {
 
   // Cart state from safe storage or default
   const [cartItems, setCartItems] = useState(() => {
-    return safeGetItem('ator_ali_cart', [
+    return safeGetItem('extrovat_cart', [
       { ...MOCK_PRODUCTS[0], quantity: 1, selectedSize: '12ml' },
       { ...MOCK_PRODUCTS[1], quantity: 1, selectedSize: '6ml' }
     ]);
@@ -67,12 +71,12 @@ export default function Home({ onResetSplash }) {
 
   // Save cart to localStorage
   useEffect(() => {
-    safeSetItem('ator_ali_cart', cartItems);
+    safeSetItem('extrovat_cart', cartItems);
   }, [cartItems]);
 
   // Load recently viewed
   useEffect(() => {
-    const loaded = safeGetItem('ator_ali_recently_viewed', []);
+    const loaded = safeGetItem('extrovat_recently_viewed', []);
     setRecentlyViewed(loaded);
   }, []);
 
@@ -89,48 +93,33 @@ export default function Home({ onResetSplash }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Add to recently viewed
   const addToRecentlyViewed = (product) => {
     if (!product) return;
     setRecentlyViewed((prev) => {
       const filtered = prev.filter((p) => p.id !== product.id);
       const updated = [product, ...filtered].slice(0, 8);
-      safeSetItem('ator_ali_recently_viewed', updated);
+      safeSetItem('extrovat_recently_viewed', updated);
       return updated;
     });
   };
 
   const handleClearRecentlyViewed = () => {
     setRecentlyViewed([]);
-    safeSetItem('ator_ali_recently_viewed', []);
+    safeSetItem('extrovat_recently_viewed', []);
   };
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const totalCartBDT = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  // Sections
-  const sections = [
-    {
-      id: 'new-arrivals',
-      title: 'NEW ARRIVALS',
-      categoryKey: 'NEW ARRIVALS'
-    },
-    {
-      id: 'premium-perfume-oil',
-      title: 'PREMIUM PERFUME OIL',
-      categoryKey: 'PREMIUM PERFUME OIL'
-    },
-    {
-      id: 'attar-collection',
-      title: 'ATTAR COLLECTION',
-      categoryKey: 'ATTAR COLLECTION'
-    },
-    {
-      id: 'combo-offers',
-      title: 'COMBO OFFERS',
-      categoryKey: 'COMBO OFFERS'
-    }
-  ];
+  // Home Page Sections
+  const sections = categoriesList.map((catName) => {
+    const sectionId = catName.toLowerCase().replace(/\s+/g, '-').replace('&', 'and');
+    return {
+      id: sectionId,
+      title: catName,
+      categoryKey: catName
+    };
+  });
 
   // Helper to filter and sort product list
   const applyFiltersAndSort = (productList) => {
@@ -138,6 +127,10 @@ export default function Home({ onResetSplash }) {
       const matchesPrice = p.price <= priceRange;
       const matchesCat =
         selectedCategories.length === 0 || selectedCategories.includes(p.category);
+      // Special logic for "Under ৳999" category filter option
+      if (selectedCategories.includes('Under ৳999') && p.price >= 1000) {
+        return false;
+      }
       return matchesPrice && matchesCat;
     });
 
@@ -238,7 +231,7 @@ export default function Home({ onResetSplash }) {
     : [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-gray-900 pb-24 selection:bg-black selection:text-white font-sans">
+    <div className="min-h-screen flex flex-col bg-[#F7F8FC] text-[#0E1330] pb-24 selection:bg-[#2436F5] selection:text-white font-sans">
       {/* Install Prompt for PWA */}
       <InstallPrompt />
 
@@ -261,7 +254,7 @@ export default function Home({ onResetSplash }) {
 
       {/* Search Bar Row */}
       {(isSearchOpen || activeSearchTerm) && (
-        <div className="bg-white border-b border-gray-100 py-2.5 px-4 shadow-xs sticky top-14 z-30 animate-in slide-in-from-top duration-200">
+        <div className="bg-[#F7F8FC] border-b-2 border-[#0E1330] py-2.5 px-4 sticky top-16 z-30 animate-in slide-in-from-top duration-200">
           <div className="max-w-7xl mx-auto flex items-center gap-2">
             <div className="flex-1">
               <SearchBar
@@ -274,9 +267,9 @@ export default function Home({ onResetSplash }) {
               type="button"
               onClick={() => setIsFilterOpen(true)}
               aria-label="Open filter options"
-              className="p-3 bg-black text-white hover:bg-gray-800 rounded-xl transition-colors cursor-pointer shrink-0 flex items-center justify-center"
+              className="p-3 bg-[#0E1330] text-[#FFFFFF] hover:bg-[#2436F5] border-2 border-[#0E1330] rounded-xl transition-colors cursor-pointer shrink-0 flex items-center justify-center shadow-[2px_2px_0px_#0E1330]"
             >
-              <SlidersHorizontal className="w-5 h-5" />
+              <SlidersHorizontal className="w-5 h-5 text-[#FFC933]" />
             </button>
           </div>
         </div>
@@ -338,24 +331,28 @@ export default function Home({ onResetSplash }) {
 
       {/* Category Drawer Modal */}
       {isCategoryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 border border-gray-200 shadow-2xl relative text-gray-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0E1330]/50 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#FFFFFF] rounded-[24px] max-w-sm w-full p-6 border-2 border-[#0E1330] shadow-[4px_4px_0px_#0E1330] relative text-[#0E1330]">
             <button
               type="button"
               onClick={() => setIsCategoryModalOpen(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-black hover:bg-gray-100 cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 rounded-xl border-2 border-[#0E1330] bg-[#FFFFFF] text-[#0E1330] hover:bg-[#F7F8FC] cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-2 mb-4">
-              <Grid className="w-5 h-5 text-black" />
-              <h3 className="text-lg font-bold text-black">Product Categories</h3>
+              <Grid className="w-5 h-5 text-[#2436F5]" />
+              <h3 className="text-lg font-heading font-extrabold text-[#0E1330]">Product categories</h3>
             </div>
 
             <div className="space-y-2">
               {sections.map((sec) => {
-                const count = MOCK_PRODUCTS.filter((p) => p.category === sec.categoryKey).length;
+                const count = MOCK_PRODUCTS.filter((p) => {
+                  if (sec.categoryKey === 'Under ৳999') return p.price < 1000;
+                  return p.category === sec.categoryKey;
+                }).length;
+
                 return (
                   <button
                     key={sec.id}
@@ -365,11 +362,11 @@ export default function Home({ onResetSplash }) {
                       const elem = document.getElementById(sec.id);
                       if (elem) elem.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="w-full text-left py-3 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 font-bold text-xs uppercase tracking-wider text-gray-800 transition-colors flex items-center justify-between cursor-pointer border border-gray-100"
+                    className="w-full text-left py-3 px-4 rounded-xl bg-[#F7F8FC] hover:bg-[#FFC933] font-heading font-bold text-xs uppercase tracking-wider text-[#0E1330] transition-colors flex items-center justify-between cursor-pointer border-2 border-[#0E1330]"
                   >
                     <span>{sec.title}</span>
-                    <span className="text-[10px] bg-black text-white px-2 py-0.5 rounded-full font-bold">
-                      {count} Items
+                    <span className="text-[10px] bg-[#0E1330] text-[#FFFFFF] px-2 py-0.5 rounded-full font-heading font-bold">
+                      {count} items
                     </span>
                   </button>
                 );
@@ -381,35 +378,35 @@ export default function Home({ onResetSplash }) {
 
       {/* Login Modal */}
       {isLoginModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 border border-gray-200 shadow-2xl relative text-center text-gray-900 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0E1330]/50 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#FFFFFF] rounded-[24px] max-w-sm w-full p-6 border-2 border-[#0E1330] shadow-[4px_4px_0px_#0E1330] relative text-center text-[#0E1330] space-y-4">
             <button
               type="button"
               onClick={() => setIsLoginModalOpen(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-black hover:bg-gray-100 cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 rounded-xl border-2 border-[#0E1330] bg-[#FFFFFF] text-[#0E1330] hover:bg-[#F7F8FC] cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center text-black mx-auto border border-gray-200">
+            <div className="w-14 h-14 bg-[#FFC933] rounded-full flex items-center justify-center text-[#0E1330] mx-auto border-2 border-[#0E1330] shadow-[2px_2px_0px_#0E1330]">
               <LogIn className="w-7 h-7" />
             </div>
 
-            <h3 className="text-lg font-bold text-black">Customer Login</h3>
-            <p className="text-xs text-gray-500">
-              Enter your mobile number to view order history and saved addresses.
+            <h3 className="text-lg font-heading font-extrabold text-[#0E1330]">Customer login</h3>
+            <p className="text-xs font-sans text-[#5B6079]">
+              Enter mobile number to view order history and saved addresses.
             </p>
 
             <input
               type="tel"
               placeholder="e.g. 01712345678"
-              className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-center font-bold focus:outline-hidden focus:border-black"
+              className="w-full px-3 py-2.5 bg-[#F7F8FC] border-2 border-[#0E1330] rounded-xl text-xs text-center font-bold focus:outline-none focus:border-[#2436F5]"
             />
 
             <button
               type="button"
               onClick={() => setIsLoginModalOpen(false)}
-              className="w-full py-3 bg-black hover:bg-gray-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-colors cursor-pointer"
+              className="w-full py-3 bg-[#2436F5] text-[#FFFFFF] font-heading font-extrabold text-xs uppercase tracking-wider rounded-full border-2 border-[#0E1330] shadow-[2px_2px_0px_#0E1330] transition-colors cursor-pointer"
             >
               Send OTP
             </button>
@@ -422,25 +419,25 @@ export default function Home({ onResetSplash }) {
         {/* Search Results View */}
         {activeSearchTerm ? (
           <div className="space-y-4">
-            <div className="flex items-center justify-between bg-gray-50 p-4 rounded-2xl border border-gray-200">
+            <div className="flex items-center justify-between bg-[#FFFFFF] p-4 rounded-[20px] border-2 border-[#0E1330] shadow-[3px_3px_0px_#0E1330]">
               <div>
                 <button
                   type="button"
                   onClick={() => setActiveSearchTerm(null)}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-black hover:underline mb-1 cursor-pointer"
+                  className="inline-flex items-center gap-1 text-xs font-heading font-bold text-[#0E1330] hover:underline mb-1 cursor-pointer"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" /> Back to Store
+                  <ArrowLeft className="w-3.5 h-3.5" /> Back to store
                 </button>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-                  Search Results for "{activeSearchTerm}"
+                <h2 className="text-lg sm:text-xl font-heading font-extrabold text-[#0E1330]">
+                  Search results for "{activeSearchTerm}"
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setIsFilterOpen(true)}
-                className="px-3 py-1.5 bg-black text-white text-xs font-bold rounded-xl flex items-center gap-1 cursor-pointer"
+                className="px-3.5 py-2 bg-[#0E1330] text-[#FFFFFF] text-xs font-heading font-bold rounded-full border border-[#0E1330] flex items-center gap-1 cursor-pointer"
               >
-                <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                <SlidersHorizontal className="w-3.5 h-3.5 text-[#FFC933]" /> Filters
               </button>
             </div>
 
@@ -457,19 +454,19 @@ export default function Home({ onResetSplash }) {
                 ))}
               </div>
             ) : (
-              <div className="bg-gray-50 rounded-2xl p-8 text-center border border-gray-200 space-y-2">
-                <p className="text-sm font-bold text-gray-800">
+              <div className="bg-[#FFFFFF] rounded-[20px] p-8 text-center border-2 border-[#0E1330] space-y-2">
+                <p className="text-sm font-heading font-bold text-[#0E1330]">
                   No matching products found for "{activeSearchTerm}"
                 </p>
-                <p className="text-xs text-gray-500">
-                  Try adjusting your filters or search keywords.
+                <p className="text-xs font-sans text-[#5B6079]">
+                  Try adjusting filters or search keywords.
                 </p>
                 <button
                   type="button"
                   onClick={handleResetFilters}
-                  className="mt-2 inline-block px-4 py-2 bg-black text-white text-xs font-bold rounded-xl"
+                  className="mt-2 inline-block px-4 py-2 bg-[#2436F5] text-[#FFFFFF] border-2 border-[#0E1330] text-xs font-heading font-bold rounded-full"
                 >
-                  Reset Filters
+                  Reset filters
                 </button>
               </div>
             )}
@@ -477,10 +474,10 @@ export default function Home({ onResetSplash }) {
         ) : (
           /* Normal Home Page View */
           <>
-            {/* Hero Banner Slider */}
+            {/* Hero Banner Carousel */}
             <HeroBanner
               onShopNowClick={() => {
-                const elem = document.getElementById('new-arrivals');
+                const elem = document.getElementById('attar');
                 if (elem) elem.scrollIntoView({ behavior: 'smooth' });
               }}
             />
@@ -499,7 +496,10 @@ export default function Home({ onResetSplash }) {
             {/* Product Category Sections */}
             {sections.map((sec) => {
               const categoryProducts = applyFiltersAndSort(
-                MOCK_PRODUCTS.filter((p) => p.category === sec.categoryKey)
+                MOCK_PRODUCTS.filter((p) => {
+                  if (sec.categoryKey === 'Under ৳999') return p.price < 1000;
+                  return p.category === sec.categoryKey;
+                })
               );
 
               if (categoryProducts.length === 0) return null;
@@ -507,13 +507,11 @@ export default function Home({ onResetSplash }) {
               return (
                 <section key={sec.id} id={sec.id} aria-label={sec.title} className="space-y-3 pt-2">
                   {/* Section Header Row */}
-                  <div className="flex items-center justify-between pb-1 border-b border-gray-100">
+                  <div className="flex items-center justify-between pb-2 border-b-2 border-[#0E1330]">
                     <div className="relative">
-                      <h2 className="text-base sm:text-lg font-extrabold text-black uppercase tracking-wider font-sans">
+                      <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-[#0E1330] tracking-tight">
                         {sec.title}
                       </h2>
-                      {/* Gold Accent Line */}
-                      <span className="absolute -bottom-[5px] left-0 w-12 h-[3px] bg-[#D4AF37] rounded-full" />
                     </div>
 
                     <button
@@ -522,9 +520,9 @@ export default function Home({ onResetSplash }) {
                         setSelectedCategories([sec.categoryKey]);
                         setIsFilterOpen(true);
                       }}
-                      className="px-3.5 py-1.5 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-full transition-colors cursor-pointer shadow-xs"
+                      className="px-4 py-1.5 bg-[#FFFFFF] text-[#0E1330] border-2 border-[#0E1330] shadow-[2px_2px_0px_#0E1330] font-heading font-bold text-xs rounded-full transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
                     >
-                      Filter & See All
+                      See all
                     </button>
                   </div>
 
@@ -564,9 +562,9 @@ export default function Home({ onResetSplash }) {
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Back to top"
-          className="fixed bottom-20 right-4 z-40 p-3 bg-black text-white hover:bg-gray-800 rounded-full shadow-lg border border-gray-700 transition-all active:scale-90 cursor-pointer animate-in fade-in"
+          className="fixed bottom-20 right-4 z-40 p-3 bg-[#FFFFFF] text-[#0E1330] hover:bg-[#FFC933] rounded-full border-2 border-[#0E1330] shadow-[3px_3px_0px_#0E1330] transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer animate-in fade-in"
         >
-          <ArrowUp className="w-5 h-5 text-white" />
+          <ArrowUp className="w-5 h-5 text-[#0E1330]" />
         </button>
       )}
 

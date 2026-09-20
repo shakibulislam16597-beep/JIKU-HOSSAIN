@@ -1,47 +1,48 @@
 import React, { useState } from 'react';
-import { X, Sparkles } from 'lucide-react';
 import { ANNOUNCEMENT_MESSAGES } from '../data/banners';
+import { X, Sparkles } from 'lucide-react';
 
 /**
- * AnnouncementBar Component
+ * AnnouncementBar Component - Extrovat Lifestyle
  *
  * Requirements:
- * - Announcement bar above header
- * - Slowly scrolling message "Free delivery on orders above ৳2000 · Cash on Delivery available · bKash / Nagad accepted"
- * - Dismissible
+ * - Ink background #0E1330
+ * - Sun-yellow text #FFC933
+ * - Slow marquee ticker text
  */
 export default function AnnouncementBar() {
-  const [isDismissed, setIsDismissed] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
-  if (isDismissed) return null;
-
-  const tickerText = ANNOUNCEMENT_MESSAGES.join('  ·  ');
+  if (!isVisible) return null;
 
   return (
-    <div className="bg-black text-white text-[11px] font-bold py-1.5 px-3 flex items-center justify-between overflow-hidden relative z-50 border-b border-gray-800">
-      <div className="flex items-center gap-1.5 shrink-0 pr-2">
-        <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-        <span className="bg-[#D4AF37] text-black text-[9px] px-1.5 py-0.2 rounded font-extrabold uppercase">
-          Offer
-        </span>
-      </div>
-
-      {/* Ticker Container */}
-      <div className="flex-1 overflow-hidden whitespace-nowrap relative">
-        <div className="inline-block animate-[marquee_20s_linear_infinite] whitespace-nowrap">
-          <span className="mx-4">{tickerText}</span>
-          <span className="mx-4">{tickerText}</span>
+    <div className="bg-[#0E1330] text-[#FFC933] border-b border-[#0E1330] py-1.5 px-3 text-xs font-sans font-bold flex items-center justify-between overflow-hidden relative">
+      <div className="flex-1 overflow-hidden whitespace-nowrap mr-2">
+        <div className="inline-block animate-[marquee_20s_linear_infinite]">
+          {ANNOUNCEMENT_MESSAGES.map((msg, idx) => (
+            <span key={idx} className="inline-flex items-center gap-2 mx-6">
+              <Sparkles className="w-3.5 h-3.5 fill-[#FFC933] shrink-0" />
+              <span>{msg}</span>
+            </span>
+          ))}
         </div>
       </div>
 
       <button
         type="button"
-        onClick={() => setIsDismissed(true)}
-        aria-label="Dismiss announcement bar"
-        className="shrink-0 pl-2 p-0.5 text-gray-400 hover:text-white transition-colors cursor-pointer"
+        onClick={() => setIsVisible(false)}
+        aria-label="Dismiss announcement"
+        className="p-0.5 rounded-md hover:bg-[#FFC933]/20 text-[#FFC933] transition-colors shrink-0 cursor-pointer"
       >
-        <X className="w-3.5 h-3.5" />
+        <X className="w-4 h-4" />
       </button>
+
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
     </div>
   );
 }

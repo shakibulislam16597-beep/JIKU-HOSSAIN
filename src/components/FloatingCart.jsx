@@ -3,13 +3,12 @@ import { ShoppingBag } from 'lucide-react';
 import { formatBDT } from '../utils/currency';
 
 /**
- * FloatingCart Component - ATOR ALI (Clean Light Theme)
- *
+ * FloatingCart Component - Extrovat Lifestyle
  * Requirements:
- * - Floating cart widget on the right edge of the screen
- * - Black top part with cart icon and item count (e.g., "2 items")
- * - White bottom part with total price in BDT (e.g., "৳ 3,800")
- * - Tapping opens cart drawer
+ * - Floating cart on the right edge
+ * - Ink top with sun-yellow cart icon and "X items"
+ * - White bottom with ৳ total price
+ * - 2px ink border and hard offset shadow
  */
 export default function FloatingCart({ itemCount = 0, totalAmount = 0, onClick }) {
   return (
@@ -17,19 +16,19 @@ export default function FloatingCart({ itemCount = 0, totalAmount = 0, onClick }
       type="button"
       onClick={onClick}
       aria-label={`Floating Cart with ${itemCount} items totaling ${formatBDT(totalAmount)}`}
-      className="fixed right-0 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center rounded-l-2xl shadow-xl overflow-hidden cursor-pointer border-l border-t border-b border-gray-200 transition-transform active:scale-95 focus:outline-hidden focus:ring-2 focus:ring-black"
+      className="fixed right-0 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center rounded-l-2xl border-2 border-r-0 border-[#0E1330] shadow-[-3px_3px_0px_#0E1330] overflow-hidden cursor-pointer transition-transform active:translate-x-[2px] focus:outline-none"
     >
-      {/* Top Black Segment */}
-      <div className="bg-black text-white px-3 py-2 flex flex-col items-center w-full min-w-[64px]">
-        <ShoppingBag className="w-5 h-5 text-white mb-0.5" />
-        <span className="text-[10px] font-bold whitespace-nowrap">
+      {/* Top Ink Segment with Sun-Yellow Icon */}
+      <div className="bg-[#0E1330] text-[#FFFFFF] px-3.5 py-2.5 flex flex-col items-center w-full min-w-[68px]">
+        <ShoppingBag className="w-5 h-5 text-[#FFC933] mb-0.5" />
+        <span className="text-[10px] font-heading font-extrabold whitespace-nowrap text-[#FFC933]">
           {itemCount} {itemCount === 1 ? 'item' : 'items'}
         </span>
       </div>
 
       {/* Bottom White Segment */}
-      <div className="bg-white text-gray-900 px-3 py-1.5 flex items-center justify-center w-full border-t border-gray-100">
-        <span className="text-xs font-extrabold text-black whitespace-nowrap">
+      <div className="bg-[#FFFFFF] text-[#0E1330] px-3 py-1.5 flex items-center justify-center w-full border-t-2 border-[#0E1330]">
+        <span className="text-xs font-sans font-extrabold text-[#0E1330] whitespace-nowrap">
           {formatBDT(totalAmount)}
         </span>
       </div>
