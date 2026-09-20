@@ -18,6 +18,7 @@ import OrderTrackingModal from './OrderTrackingModal';
 import InstallPrompt from './InstallPrompt';
 
 import { MOCK_PRODUCTS } from '../data/products';
+import { getStorefrontData } from '../lib/storefrontData';
 import { safeGetItem, safeSetItem } from '../utils/storage';
 import { X, ArrowLeft, Grid, LogIn, ArrowUp, SlidersHorizontal } from 'lucide-react';
 
@@ -25,6 +26,7 @@ import { X, ArrowLeft, Grid, LogIn, ArrowUp, SlidersHorizontal } from 'lucide-re
  * Home Component - Extrovat Lifestyle
  */
 export default function Home({ onResetSplash, isAdmin = false }) {
+  const [storefrontProducts, setStorefrontProducts] = useState(MOCK_PRODUCTS);
   const [activeTab, setActiveTab] = useState('home');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [activeSearchTerm, setActiveSearchTerm] = useState(null);
@@ -73,6 +75,23 @@ export default function Home({ onResetSplash, isAdmin = false }) {
   useEffect(() => {
     safeSetItem('extrovat_cart', cartItems);
   }, [cartItems]);
+
+  // Load storefront products from Firestore or cache with fallback
+  useEffect(() => {
+    let isMounted = true;
+    getStorefrontData()
+      .then((data) => {
+        if (isMounted && data && Array.isArray(data.products) && data.products.length > 0) {
+          setStorefrontProducts(data.products);
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to load storefront data, using fallback:', err);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Load recently viewed
   useEffect(() => {
@@ -221,10 +240,10 @@ export default function Home({ onResetSplash, isAdmin = false }) {
 
   const searchResults = activeSearchTerm
     ? applyFiltersAndSort(
-        MOCK_PRODUCTS.filter(
+        storefrontProducts.filter(
           (p) =>
-            p.title.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
-            p.category.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+            (p.title || p.name || '').toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+            (p.category || p.categoryName || '').toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
             (p.note && p.note.toLowerCase().includes(activeSearchTerm.toLowerCase()))
         )
       )
@@ -262,6 +281,7 @@ export default function Home({ onResetSplash, isAdmin = false }) {
                 onSearchSubmit={handleSearchSubmit}
                 onSelectProduct={handleSelectProduct}
                 autoFocus={isSearchOpen}
+                products={storefrontProducts}
               />
             </div>
             <button
@@ -349,7 +369,7 @@ export default function Home({ onResetSplash, isAdmin = false }) {
 
             <div className="space-y-2">
               {sections.map((sec) => {
-                const count = MOCK_PRODUCTS.filter((p) => {
+                const count = storefrontProducts.filter((p) => {
                   if (sec.categoryKey === 'Under ৳999') return p.price < 1000;
                   return p.category === sec.categoryKey;
                 }).length;
@@ -492,12 +512,12 @@ export default function Home({ onResetSplash, isAdmin = false }) {
             />
 
             {/* Scent Finder Interactive Quiz */}
-            <ScentFinderQuiz onAddToCart={handleAddToCart} />
+            <ScentFinderQuiz onAddToCart={handleAddToCart} products={storefrontProducts} />
 
             {/* Product Category Sections */}
             {sections.map((sec) => {
               const categoryProducts = applyFiltersAndSort(
-                MOCK_PRODUCTS.filter((p) => {
+                storefrontProducts.filter((p) => {
                   if (sec.categoryKey === 'Under ৳999') return p.price < 1000;
                   return p.category === sec.categoryKey;
                 })
