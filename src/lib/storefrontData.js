@@ -9,6 +9,9 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
  * Normalizes raw product document from Firestore or mock data into a uniform storefront format.
  */
 export function normalizeProduct(rawDoc, docId) {
+  if (!rawDoc || typeof rawDoc !== 'object') {
+    rawDoc = {};
+  }
   const id = docId || rawDoc.id || `prod-${Math.random().toString(36).substring(2, 9)}`;
   const name = rawDoc.name || rawDoc.title || 'Extrovat Product';
   const categoryName = rawDoc.categoryName || rawDoc.category || 'Attar';
