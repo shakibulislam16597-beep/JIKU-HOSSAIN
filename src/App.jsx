@@ -26,26 +26,44 @@ export default function App() {
 
   // Firebase auth state listener + admins/{uid} check
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        try {
-          const adminDocRef = doc(db, 'admins', currentUser.uid);
-          const adminDocSnap = await getDoc(adminDocRef);
-          if (adminDocSnap.exists() && adminDocSnap.data()?.active === true) {
-            setIsAdminActive(true);
+    if (!auth) {
+      setAuthChecking(false);
+      return;
+    }
+
+    let unsubscribe = () => {};
+    try {
+      unsubscribe = onAuthStateChanged(
+        auth,
+        async (currentUser) => {
+          setUser(currentUser);
+          if (currentUser && db) {
+            try {
+              const adminDocRef = doc(db, 'admins', currentUser.uid);
+              const adminDocSnap = await getDoc(adminDocRef);
+              if (adminDocSnap.exists() && adminDocSnap.data()?.active === true) {
+                setIsAdminActive(true);
+              } else {
+                setIsAdminActive(false);
+              }
+            } catch (e) {
+              console.error('Error verifying admin status:', e);
+              setIsAdminActive(false);
+            }
           } else {
             setIsAdminActive(false);
           }
-        } catch (e) {
-          console.error('Error verifying admin status:', e);
-          setIsAdminActive(false);
+          setAuthChecking(false);
+        },
+        (error) => {
+          console.error('Auth listener error:', error);
+          setAuthChecking(false);
         }
-      } else {
-        setIsAdminActive(false);
-      }
+      );
+    } catch (err) {
+      console.error('Failed to attach auth listener:', err);
       setAuthChecking(false);
-    });
+    }
 
     return () => unsubscribe();
   }, []);
