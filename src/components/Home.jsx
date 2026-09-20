@@ -556,6 +556,21 @@ export default function Home({ onResetSplash }) {
         )}
       </main>
 
+      {/* Storefront Footer with Staff Login Link */}
+      <footer className="border-t-2 border-[#0E1330] bg-[#FFFFFF] py-6 px-4 mt-8 mb-16 text-center text-xs font-sans text-[#5B6079]">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="font-heading font-bold text-[#0E1330]">
+            © {new Date().getFullYear()} Extrovat Lifestyle. All rights reserved.
+          </p>
+          <a
+            href="#/admin/login"
+            className="text-[11px] font-heading font-bold text-[#5B6079] hover:text-[#2436F5] underline underline-offset-2 transition-colors cursor-pointer"
+          >
+            Staff login
+          </a>
+        </div>
+      </footer>
+
       {/* Back To Top Floating Button */}
       {showBackToTop && (
         <button
