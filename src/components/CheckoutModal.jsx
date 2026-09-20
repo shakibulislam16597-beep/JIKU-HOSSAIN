@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { WHATSAPP_NUMBER, BKASH_NUMBER, NAGAD_NUMBER } from '../config';
 import { BANGLADESH_DISTRICTS } from '../data/districts';
-import { formatBDT, formatUSD } from '../utils/currency';
+import { formatBDT } from '../utils/currency';
 import {
   X,
   User,
@@ -19,14 +19,7 @@ import {
 } from 'lucide-react';
 
 /**
- * CheckoutModal Component
- *
- * Requirements:
- * - Validate Full Name, Phone (BD format 01XXXXXXXXX), Address, District dropdown.
- * - Delivery charge: ৳80 inside Dhaka, ৳130 outside Dhaka.
- * - Payment options: Cash on Delivery, bKash (pink accent), Nagad (orange accent).
- * - bKash/Nagad payment box: Large gold number, Copy button with "Copied!", exact total amount, 4-step instructions, and required Sender Number & TrxID fields.
- * - On submit, triggers WhatsApp wa.me URL with pre-filled order details & calls onSuccess.
+ * CheckoutModal Component - ATOR ALI (Clean Light Theme)
  */
 export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrder }) {
   if (!isOpen) return null;
@@ -47,32 +40,28 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
   const [errors, setErrors] = useState({});
 
   // Pricing calculations
-  const itemsSubtotalUSD = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const itemsSubtotalBDT = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const isInsideDhaka = district.trim().toLowerCase() === 'dhaka';
   const deliveryChargeBDT = isInsideDhaka ? 80 : 130;
-  const itemsSubtotalBDT = Math.round(itemsSubtotalUSD * 122);
   const grandTotalBDT = itemsSubtotalBDT + deliveryChargeBDT;
 
-  // Selected payment MFS details
   const getMfsDetails = () => {
     if (paymentMethod === 'bkash') {
       return {
         name: 'bKash',
         number: BKASH_NUMBER,
-        bgColor: 'bg-pink-950/40 border-pink-500/40',
-        textColor: 'text-pink-400',
-        badgeBg: 'bg-pink-600',
-        brandAccent: '#E2136E'
+        bgColor: 'bg-pink-50 border-pink-200',
+        textColor: 'text-pink-700',
+        badgeBg: 'bg-[#E2136E] text-white',
       };
     }
     if (paymentMethod === 'nagad') {
       return {
         name: 'Nagad',
         number: NAGAD_NUMBER,
-        bgColor: 'bg-orange-950/40 border-orange-500/40',
-        textColor: 'text-orange-400',
-        badgeBg: 'bg-orange-600',
-        brandAccent: '#F7921E'
+        bgColor: 'bg-orange-50 border-orange-200',
+        textColor: 'text-orange-700',
+        badgeBg: 'bg-[#F7921E] text-white',
       };
     }
     return null;
@@ -84,7 +73,6 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Validation
   const validateForm = () => {
     const newErrors = {};
 
@@ -92,7 +80,6 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
       newErrors.fullName = 'Full name is required';
     }
 
-    // BD Phone format: 01 followed by 9 digits (total 11 digits)
     const phoneRegex = /^01[3-9]\d{8}$/;
     const cleanPhone = phone.trim().replace(/[\s-]/g, '');
     if (!cleanPhone) {
@@ -109,7 +96,6 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
       newErrors.district = 'Please select a district';
     }
 
-    // Validation for bKash / Nagad payment box
     if (paymentMethod === 'bkash' || paymentMethod === 'nagad') {
       const mfsName = paymentMethod === 'bkash' ? 'bKash' : 'Nagad';
       const cleanSender = senderNumber.trim().replace(/[\s-]/g, '');
@@ -130,13 +116,11 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
     return Object.keys(newErrors).length === 0;
   };
 
-  // Submit Handler
   const handleSubmitOrder = (e) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
-    // Build Itemized WhatsApp Text
     let message = `NEW ORDER - ATOR ALI STORE\n`;
     message += `===========================\n\n`;
     message += `CUSTOMER DETAILS:\n`;
@@ -148,14 +132,14 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
     message += `ORDERED ITEMS:\n`;
     cartItems.forEach((item, idx) => {
       const sizeStr = item.size ? ` (${item.size})` : '';
-      const lineBDT = `৳${Math.round(item.price * item.quantity * 122).toLocaleString('en-US')}`;
+      const lineBDT = formatBDT(item.price * item.quantity);
       message += `${idx + 1}. ${item.title}${sizeStr} x ${item.quantity} = ${lineBDT}\n`;
     });
 
     message += `\nPRICING SUMMARY:\n`;
-    message += `Items Subtotal: ৳${itemsSubtotalBDT.toLocaleString('en-US')}\n`;
-    message += `Delivery Charge: ৳${deliveryChargeBDT} (${isInsideDhaka ? 'Inside Dhaka' : 'Outside Dhaka'})\n`;
-    message += `GRAND TOTAL: ৳${grandTotalBDT.toLocaleString('en-US')}\n\n`;
+    message += `Items Subtotal: ${formatBDT(itemsSubtotalBDT)}\n`;
+    message += `Delivery Charge: ${formatBDT(deliveryChargeBDT)} (${isInsideDhaka ? 'Inside Dhaka' : 'Outside Dhaka'})\n`;
+    message += `GRAND TOTAL: ${formatBDT(grandTotalBDT)}\n\n`;
 
     message += `PAYMENT METHOD:\n`;
     if (paymentMethod === 'cod') {
@@ -167,30 +151,28 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
       message += `Transaction ID (TrxID): ${trxId.trim()}\n`;
     }
 
-    // Open WhatsApp URL in new tab
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=` + encodeURIComponent(message);
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
 
-    // Trigger success callback to show Thank You screen and clear cart
     onSuccessOrder();
   };
 
   const mfsDetails = getMfsDetails();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
-      <div className="bg-[#0B0B0B] rounded-3xl max-w-xl w-full p-5 sm:p-7 border border-[#D4AF37]/40 shadow-2xl relative text-white my-auto max-h-[92vh] overflow-y-auto scrollbar-thin">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
+      <div className="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-7 border border-gray-200 shadow-2xl relative text-gray-900 my-auto max-h-[92vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#D4AF37]/20 mb-5">
+        <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-4">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/30 text-[#D4AF37]">
-              <ShieldCheck className="w-5 h-5 text-[#D4AF37]" />
+            <div className="p-2 rounded-xl bg-black text-white">
+              <ShieldCheck className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-lg sm:text-xl font-bold font-serif text-white">
+              <h2 className="text-lg sm:text-xl font-bold text-black">
                 ATOR ALI Checkout
               </h2>
-              <p className="text-[11px] text-[#D4AF37] font-medium">
+              <p className="text-xs text-gray-500">
                 Enter delivery details & select payment method
               </p>
             </div>
@@ -200,38 +182,38 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
             type="button"
             onClick={onClose}
             aria-label="Close checkout"
-            className="p-2 rounded-full text-slate-400 hover:text-white bg-[#1A1812] border border-[#D4AF37]/20 transition-colors cursor-pointer"
+            className="p-2 rounded-full text-gray-400 hover:text-black hover:bg-gray-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmitOrder} className="space-y-5">
+        <form onSubmit={handleSubmitOrder} className="space-y-4">
           {/* 1. Customer Information */}
-          <div className="space-y-3.5 bg-[#14120C] p-4 rounded-2xl border border-[#D4AF37]/20">
-            <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5" /> 1. Delivery Information
+          <div className="space-y-3 bg-gray-50 p-4 rounded-2xl border border-gray-200">
+            <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5 text-black" /> 1. Delivery Information
             </h3>
 
             {/* Full Name */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Full Name <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Tanvir Ahmed"
-                  className={`w-full pl-9 pr-3 py-2.5 bg-[#0B0B0B] border rounded-xl text-xs text-white focus:outline-none transition-colors ${
-                    errors.fullName ? 'border-rose-500' : 'border-[#D4AF37]/30 focus:border-[#D4AF37]'
+                  className={`w-full pl-9 pr-3 py-2 bg-white border rounded-xl text-xs text-gray-900 focus:outline-hidden transition-colors ${
+                    errors.fullName ? 'border-rose-500' : 'border-gray-200 focus:border-black'
                   }`}
                 />
               </div>
               {errors.fullName && (
-                <p className="text-[11px] text-rose-400 mt-1 flex items-center gap-1">
+                <p className="text-[11px] text-rose-500 mt-0.5 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3 shrink-0" /> {errors.fullName}
                 </p>
               )}
@@ -239,23 +221,23 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
 
             {/* Phone Number */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Phone Number (BD 01XXXXXXXXX) <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="e.g. 01712345678"
-                  className={`w-full pl-9 pr-3 py-2.5 bg-[#0B0B0B] border rounded-xl text-xs text-white focus:outline-none transition-colors ${
-                    errors.phone ? 'border-rose-500' : 'border-[#D4AF37]/30 focus:border-[#D4AF37]'
+                  className={`w-full pl-9 pr-3 py-2 bg-white border rounded-xl text-xs text-gray-900 focus:outline-hidden transition-colors ${
+                    errors.phone ? 'border-rose-500' : 'border-gray-200 focus:border-black'
                   }`}
                 />
               </div>
               {errors.phone && (
-                <p className="text-[11px] text-rose-400 mt-1 flex items-center gap-1">
+                <p className="text-[11px] text-rose-500 mt-0.5 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3 shrink-0" /> {errors.phone}
                 </p>
               )}
@@ -263,23 +245,23 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
 
             {/* Address */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Full Delivery Address <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <MapPin className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                <MapPin className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
                 <textarea
                   rows={2}
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="House no, Road no, Area, Thana"
-                  className={`w-full pl-9 pr-3 py-2 bg-[#0B0B0B] border rounded-xl text-xs text-white focus:outline-none transition-colors ${
-                    errors.address ? 'border-rose-500' : 'border-[#D4AF37]/30 focus:border-[#D4AF37]'
+                  className={`w-full pl-9 pr-3 py-2 bg-white border rounded-xl text-xs text-gray-900 focus:outline-hidden transition-colors ${
+                    errors.address ? 'border-rose-500' : 'border-gray-200 focus:border-black'
                   }`}
                 />
               </div>
               {errors.address && (
-                <p className="text-[11px] text-rose-400 mt-1 flex items-center gap-1">
+                <p className="text-[11px] text-rose-500 mt-0.5 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3 shrink-0" /> {errors.address}
                 </p>
               )}
@@ -287,21 +269,19 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
 
             {/* District Dropdown (64 Districts) */}
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 District <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Building className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                <Building className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className={`w-full pl-9 pr-8 py-2.5 bg-[#0B0B0B] border rounded-xl text-xs text-white focus:outline-none cursor-pointer transition-colors ${
-                    errors.district ? 'border-rose-500' : 'border-[#D4AF37]/30 focus:border-[#D4AF37]'
-                  }`}
+                  className="w-full pl-9 pr-8 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-hidden focus:border-black cursor-pointer"
                 >
                   {BANGLADESH_DISTRICTS.map((d) => (
-                    <option key={d} value={d} className="bg-[#0B0B0B] text-white">
-                      {d} {d === 'Dhaka' ? '(Inside Dhaka)' : '(Outside Dhaka)'}
+                    <option key={d} value={d}>
+                      {d} {d === 'Dhaka' ? '(Inside Dhaka ৳80)' : '(Outside Dhaka ৳130)'}
                     </option>
                   ))}
                 </select>
@@ -309,65 +289,61 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
             </div>
           </div>
 
-          {/* 2. Delivery Charge & Total Summary */}
-          <div className="bg-[#14120C] p-4 rounded-2xl border border-[#D4AF37]/20 space-y-2">
-            <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5 mb-2">
-              <Truck className="w-3.5 h-3.5" /> 2. Order Summary
+          {/* 2. Order Summary */}
+          <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-1.5">
+            <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+              <Truck className="w-3.5 h-3.5 text-black" /> 2. Order Summary
             </h3>
-            <div className="flex justify-between items-center text-xs text-slate-300">
+            <div className="flex justify-between items-center text-xs text-gray-600">
               <span>Items Subtotal</span>
-              <span className="font-semibold text-white">
-                ৳{itemsSubtotalBDT.toLocaleString('en-US')} ({formatUSD(itemsSubtotalUSD)})
-              </span>
+              <span className="font-bold text-gray-900">{formatBDT(itemsSubtotalBDT)}</span>
             </div>
-            <div className="flex justify-between items-center text-xs text-slate-300">
+            <div className="flex justify-between items-center text-xs text-gray-600">
               <span>Delivery Charge</span>
-              <span className="font-semibold text-[#D4AF37]">
-                ৳{deliveryChargeBDT} ({isInsideDhaka ? 'Inside Dhaka' : 'Outside Dhaka'})
+              <span className="font-bold text-black">
+                {formatBDT(deliveryChargeBDT)} ({isInsideDhaka ? 'Inside Dhaka' : 'Outside Dhaka'})
               </span>
             </div>
-            <div className="border-t border-[#D4AF37]/20 pt-2 flex justify-between items-baseline">
-              <span className="text-sm font-bold font-serif text-white">Grand Total</span>
-              <span className="text-xl font-extrabold text-[#D4AF37]">
-                ৳{grandTotalBDT.toLocaleString('en-US')}
+            <div className="border-t border-gray-200 pt-2 flex justify-between items-baseline">
+              <span className="text-sm font-bold text-black">Grand Total</span>
+              <span className="text-xl font-extrabold text-black">
+                {formatBDT(grandTotalBDT)}
               </span>
             </div>
           </div>
 
-          {/* 3. Selectable Payment Methods */}
-          <div className="space-y-3 bg-[#14120C] p-4 rounded-2xl border border-[#D4AF37]/20">
-            <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5">
-              <CreditCard className="w-3.5 h-3.5" /> 3. Select Payment Method
+          {/* 3. Select Payment Method */}
+          <div className="space-y-3 bg-gray-50 p-4 rounded-2xl border border-gray-200">
+            <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+              <CreditCard className="w-3.5 h-3.5 text-black" /> 3. Select Payment Method
             </h3>
 
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-3 gap-2">
               {/* Cash on Delivery */}
               <button
                 type="button"
                 onClick={() => setPaymentMethod('cod')}
-                className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+                className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
                   paymentMethod === 'cod'
-                    ? 'bg-[#2B230F] border-[#D4AF37] text-[#D4AF37] shadow-md shadow-[#D4AF37]/20'
-                    : 'bg-[#0B0B0B] border-[#D4AF37]/20 text-slate-300 hover:border-[#D4AF37]/50'
+                    ? 'bg-black border-black text-white shadow-xs'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400'
                 }`}
               >
-                <Banknote className="w-5 h-5 text-[#D4AF37]" />
-                <span className="text-[11px] font-extrabold leading-tight">Cash on Delivery</span>
+                <Banknote className="w-5 h-5" />
+                <span className="text-[11px] font-bold leading-tight">Cash on Delivery</span>
               </button>
 
               {/* bKash */}
               <button
                 type="button"
                 onClick={() => setPaymentMethod('bkash')}
-                className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+                className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
                   paymentMethod === 'bkash'
-                    ? 'bg-pink-950/60 border-pink-500 text-pink-400 shadow-md shadow-pink-900/30'
-                    : 'bg-[#0B0B0B] border-[#D4AF37]/20 text-slate-300 hover:border-pink-500/50'
+                    ? 'bg-[#E2136E] border-[#E2136E] text-white shadow-xs'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-pink-300'
                 }`}
               >
-                <span className="text-xs font-extrabold px-2 py-0.5 rounded bg-[#E2136E] text-white">
-                  bKash
-                </span>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider">bKash</span>
                 <span className="text-[11px] font-bold leading-tight">Send Money</span>
               </button>
 
@@ -375,38 +351,36 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
               <button
                 type="button"
                 onClick={() => setPaymentMethod('nagad')}
-                className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 ${
+                className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
                   paymentMethod === 'nagad'
-                    ? 'bg-orange-950/60 border-orange-500 text-orange-400 shadow-md shadow-orange-900/30'
-                    : 'bg-[#0B0B0B] border-[#D4AF37]/20 text-slate-300 hover:border-orange-500/50'
+                    ? 'bg-[#F7921E] border-[#F7921E] text-white shadow-xs'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-orange-300'
                 }`}
               >
-                <span className="text-xs font-extrabold px-2 py-0.5 rounded bg-[#F7921E] text-white">
-                  Nagad
-                </span>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider">Nagad</span>
                 <span className="text-[11px] font-bold leading-tight">Send Money</span>
               </button>
             </div>
 
             {/* MFS Payment Instructions Box (bKash or Nagad) */}
             {(paymentMethod === 'bkash' || paymentMethod === 'nagad') && mfsDetails && (
-              <div className={`mt-3 p-4 rounded-2xl border ${mfsDetails.bgColor} space-y-3 animate-in fade-in duration-200`}>
+              <div className={`p-3.5 rounded-xl border ${mfsDetails.bgColor} space-y-2.5`}>
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs font-extrabold px-2.5 py-1 rounded text-white ${mfsDetails.badgeBg}`}>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${mfsDetails.badgeBg}`}>
                     {mfsDetails.name} Send Money Instructions
                   </span>
-                  <span className="text-[11px] text-slate-300 font-medium">
-                    Send Exact: <strong className="text-[#D4AF37]">৳{grandTotalBDT.toLocaleString('en-US')}</strong>
+                  <span className="text-[11px] text-gray-700 font-semibold">
+                    Send Exact: <strong className="text-black">{formatBDT(grandTotalBDT)}</strong>
                   </span>
                 </div>
 
                 {/* Number with Copy Button */}
-                <div className="bg-[#0B0B0B] p-3 rounded-xl border border-[#D4AF37]/30 flex items-center justify-between gap-2">
+                <div className="bg-white p-2.5 rounded-lg border border-gray-200 flex items-center justify-between gap-2">
                   <div>
-                    <span className="text-[10px] text-slate-400 block uppercase font-bold">
+                    <span className="text-[10px] text-gray-500 block font-bold uppercase">
                       Send Money to this number:
                     </span>
-                    <span className="text-xl sm:text-2xl font-mono font-extrabold text-[#D4AF37] tracking-wider">
+                    <span className="text-lg font-mono font-extrabold text-black tracking-wider">
                       {mfsDetails.number}
                     </span>
                   </div>
@@ -414,12 +388,12 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
                   <button
                     type="button"
                     onClick={() => handleCopyNumber(mfsDetails.number)}
-                    className="inline-flex items-center gap-1 px-3 py-2 bg-[#1A1812] hover:bg-[#252014] text-[#D4AF37] border border-[#D4AF37]/40 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-black text-white rounded-lg text-xs font-bold hover:bg-gray-800 cursor-pointer"
                   >
                     {copied ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="text-emerald-400">Copied!</span>
+                        <span>Copied!</span>
                       </>
                     ) : (
                       <>
@@ -431,48 +405,48 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
                 </div>
 
                 {/* Steps */}
-                <ol className="text-xs text-slate-300 space-y-1 list-decimal list-inside font-medium bg-[#0B0B0B]/60 p-3 rounded-xl border border-white/5">
+                <ol className="text-[11px] text-gray-700 space-y-0.5 list-decimal list-inside font-medium bg-white/60 p-2 rounded-lg border border-gray-200">
                   <li>Open your {mfsDetails.name} app.</li>
                   <li>Choose <strong>Send Money</strong>.</li>
-                  <li>Send exact amount <strong>৳{grandTotalBDT.toLocaleString('en-US')}</strong> to <strong>{mfsDetails.number}</strong>.</li>
-                  <li>Enter your Sender Number and Transaction ID (TrxID) below.</li>
+                  <li>Send exact <strong>{formatBDT(grandTotalBDT)}</strong> to <strong>{mfsDetails.number}</strong>.</li>
+                  <li>Enter Sender Number & TrxID below.</li>
                 </ol>
 
-                {/* Sender Number & TrxID Input Fields */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {/* Sender Number & TrxID Fields */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-200 mb-1">
-                      {mfsDetails.name} Sender Number <span className="text-rose-500">*</span>
+                    <label className="block text-[11px] font-bold text-gray-800 mb-0.5">
+                      Sender Number <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="tel"
                       value={senderNumber}
                       onChange={(e) => setSenderNumber(e.target.value)}
                       placeholder="e.g. 01712345678"
-                      className={`w-full px-3 py-2 bg-[#0B0B0B] border rounded-xl text-xs text-white focus:outline-none ${
-                        errors.senderNumber ? 'border-rose-500' : 'border-[#D4AF37]/30 focus:border-[#D4AF37]'
+                      className={`w-full px-2.5 py-1.5 bg-white border rounded-lg text-xs text-gray-900 focus:outline-hidden ${
+                        errors.senderNumber ? 'border-rose-500' : 'border-gray-200 focus:border-black'
                       }`}
                     />
                     {errors.senderNumber && (
-                      <p className="text-[10px] text-rose-400 mt-0.5">{errors.senderNumber}</p>
+                      <p className="text-[10px] text-rose-500 mt-0.5">{errors.senderNumber}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-200 mb-1">
-                      Transaction ID (TrxID) <span className="text-rose-500">*</span>
+                    <label className="block text-[11px] font-bold text-gray-800 mb-0.5">
+                      TrxID <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={trxId}
                       onChange={(e) => setTrxId(e.target.value)}
                       placeholder="e.g. 9J4K2L8M"
-                      className={`w-full px-3 py-2 bg-[#0B0B0B] border rounded-xl text-xs text-white uppercase focus:outline-none ${
-                        errors.trxId ? 'border-rose-500' : 'border-[#D4AF37]/30 focus:border-[#D4AF37]'
+                      className={`w-full px-2.5 py-1.5 bg-white border rounded-lg text-xs text-gray-900 uppercase focus:outline-hidden ${
+                        errors.trxId ? 'border-rose-500' : 'border-gray-200 focus:border-black'
                       }`}
                     />
                     {errors.trxId && (
-                      <p className="text-[10px] text-rose-400 mt-0.5">{errors.trxId}</p>
+                      <p className="text-[10px] text-rose-500 mt-0.5">{errors.trxId}</p>
                     )}
                   </div>
                 </div>
@@ -483,10 +457,10 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, onSuccessOrd
           {/* Submit Action */}
           <button
             type="submit"
-            className="w-full py-4 bg-[#D4AF37] hover:bg-[#E5BF42] text-black font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-full shadow-lg shadow-[#D4AF37]/25 hover:scale-[1.01] active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+            className="w-full py-3.5 bg-black hover:bg-gray-800 text-white font-bold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
           >
-            <span>Confirm Order on WhatsApp (৳{grandTotalBDT.toLocaleString('en-US')})</span>
-            <ArrowRight className="w-4 h-4 text-black" />
+            <span>Confirm Order on WhatsApp ({formatBDT(grandTotalBDT)})</span>
+            <ArrowRight className="w-4 h-4 text-white" />
           </button>
         </form>
       </div>

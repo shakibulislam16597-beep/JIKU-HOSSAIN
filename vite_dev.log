@@ -23,3 +23,16 @@
 4:58:48 PM [vite] (client) hmr update /src/index.css, /src/components/HeroBanner.jsx, /src/components/FlashSaleStrip.jsx, /src/components/WhatsAppBanner.jsx, /src/components/PromoBanner.jsx, /src/components/CartDrawer.jsx
 5:00:07 PM [vite] (client) hmr update /src/index.css, /src/components/CartDrawer.jsx
 5:00:36 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
+5:15:57 PM [vite] (client) page reload src/main.jsx
+5:16:05 PM [vite] (client) hmr update /src/index.css
+5:16:05 PM [vite] (client) hmr update /src/index.css
+5:16:39 PM [vite] (client) hmr update /src/index.css, /src/components/Home.jsx, /src/components/CartDrawer.jsx, /src/components/CheckoutModal.jsx
+5:16:50 PM [vite] (client) hmr update /src/index.css, /src/components/Home.jsx, /src/components/SearchBar.jsx
+5:17:18 PM [vite] (client) hmr update /src/index.css, /src/components/Header.jsx
+5:17:35 PM [vite] (client) hmr update /src/index.css, /src/components/SearchBar.jsx
+5:18:11 PM [vite] (client) hmr update /src/index.css, /src/components/HeroBanner.jsx
+5:18:46 PM [vite] (client) hmr update /src/index.css, /src/components/CartDrawer.jsx
+5:19:11 PM [vite] (client) hmr update /src/index.css, /src/components/CheckoutModal.jsx
+5:19:16 PM [vite] (client) hmr update /src/index.css, /src/components/OrderSuccessModal.jsx
+5:19:47 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css
+5:20:00 PM [vite] (client) hmr update /src/index.css, /src/components/WhatsAppBanner.jsx
