@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Download, X } from 'lucide-react';
 
 /**
- * InstallPrompt Component - PWA install banner
+ * InstallPrompt Component - PWA install banner for Extrovat Lifestyle
  */
 export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
@@ -26,7 +26,7 @@ export default function InstallPrompt() {
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === 'accepted') {
-      console.log('User accepted ATOR ALI PWA install');
+      console.log('User accepted Extrovat Lifestyle PWA install');
     }
     setDeferredPrompt(null);
   };
@@ -34,14 +34,14 @@ export default function InstallPrompt() {
   if (isDismissed || !deferredPrompt) return null;
 
   return (
-    <div className="fixed bottom-16 left-4 right-4 z-40 bg-black text-white p-3 rounded-2xl shadow-2xl border border-gray-800 flex items-center justify-between gap-3 animate-in slide-in-from-bottom duration-300 max-w-md mx-auto">
+    <div className="fixed bottom-16 left-4 right-4 z-40 bg-[#FFFFFF] text-[#0E1330] p-3.5 rounded-[20px] shadow-[4px_4px_0px_#0E1330] border-2 border-[#0E1330] flex items-center justify-between gap-3 animate-in slide-in-from-bottom duration-300 max-w-md mx-auto">
       <div className="flex items-center gap-2.5">
-        <div className="w-9 h-9 rounded-xl bg-[#D4AF37] text-black font-extrabold flex items-center justify-center text-xs shrink-0">
-          AA
+        <div className="w-9 h-9 rounded-xl bg-[#0E1330] text-[#FFFFFF] font-heading font-extrabold flex items-center justify-center text-xs shrink-0">
+          EL
         </div>
         <div>
-          <h4 className="text-xs font-bold text-white">Add ATOR ALI App</h4>
-          <p className="text-[10px] text-gray-300">Fast access from your home screen</p>
+          <h4 className="text-xs font-heading font-bold text-[#0E1330]">Add Extrovat Lifestyle App</h4>
+          <p className="text-[10px] font-sans text-[#5B6079]">Fast access from your home screen</p>
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export default function InstallPrompt() {
         <button
           type="button"
           onClick={handleInstallClick}
-          className="px-3 py-1.5 bg-[#D4AF37] hover:bg-[#E5BF42] text-black font-extrabold text-[11px] uppercase rounded-xl transition-colors cursor-pointer flex items-center gap-1"
+          className="px-3 py-1.5 bg-[#FFC933] text-[#0E1330] font-heading font-extrabold text-[11px] border border-[#0E1330] uppercase rounded-full transition-colors cursor-pointer flex items-center gap-1"
         >
           <Download className="w-3.5 h-3.5" />
           <span>Install</span>
@@ -58,7 +58,7 @@ export default function InstallPrompt() {
         <button
           type="button"
           onClick={() => setIsDismissed(true)}
-          className="p-1 text-gray-400 hover:text-white"
+          className="p-1 text-[#5B6079] hover:text-[#0E1330]"
         >
           <X className="w-4 h-4" />
         </button>

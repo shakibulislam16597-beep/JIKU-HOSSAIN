@@ -1,5 +1,6 @@
 /**
  * Safe LocalStorage Utilities with try/catch error handling
+ * Uses "extrovat_" prefix for all storage keys
  */
 
 export function safeGetItem(key, defaultValue = null) {
@@ -30,8 +31,8 @@ export function setStorageItem(key, value) {
   return safeSetItem(key, value);
 }
 
-const RECENTLY_VIEWED_KEY = 'ator_ali_recently_viewed';
-const ORDERS_KEY = 'ator_ali_orders';
+const RECENTLY_VIEWED_KEY = 'extrovat_recently_viewed';
+const ORDERS_KEY = 'extrovat_orders';
 
 export function getRecentlyViewed() {
   return safeGetItem(RECENTLY_VIEWED_KEY, []);
@@ -42,7 +43,7 @@ export function addRecentlyViewed(product) {
   try {
     const existing = getRecentlyViewed();
     const filtered = existing.filter((item) => item.id !== product.id);
-    const updated = [product, ...filtered].slice(0, 8); // Keep last 8 opened products
+    const updated = [product, ...filtered].slice(0, 8);
     safeSetItem(RECENTLY_VIEWED_KEY, updated);
     return updated;
   } catch (err) {
