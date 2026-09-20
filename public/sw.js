@@ -1,9 +1,9 @@
-const CACHE_NAME = 'ator-ali-cache-v1';
+const CACHE_NAME = 'ator-ali-cache-v2';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(['./', './index.html']);
+      return cache.addAll(['./', 'index.html']);
     })
   );
   self.skipWaiting();
@@ -22,14 +22,19 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      return (
-        cached ||
-        fetch(event.request).catch(() => {
-          return caches.match('./');
-        })
-      );
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(event.request).catch((err) => {
+        // Only return cached index.html for navigation requests, NOT JS/CSS assets
+        if (event.request.mode === 'navigate') {
+          return caches.match('./') || caches.match('index.html');
+        }
+        throw err;
+      });
     })
   );
 });
