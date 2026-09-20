@@ -3,6 +3,12 @@ import { WHATSAPP_NUMBER } from '../config';
 
 export { WHATSAPP_NUMBER };
 
+export const ANNOUNCEMENT_MESSAGES = [
+  'Free delivery on orders above ৳2000',
+  'Cash on Delivery available across Bangladesh',
+  'bKash / Nagad accepted with instant confirmation'
+];
+
 export const HERO_SLIDES = [
   {
     id: 'slide-1',
@@ -39,6 +45,38 @@ export const HERO_SLIDES = [
     buttonText: 'Explore Oud',
     image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=1200',
     alt: 'Aged Royal Oud oil bottles and wood'
+  }
+];
+
+export const SCENT_QUIZ_QUESTIONS = [
+  {
+    id: 'occasion',
+    question: '1. What is your primary occasion?',
+    options: [
+      { label: 'Daily Wear & Office', value: 'daily' },
+      { label: 'Jummah & Prayers', value: 'prayer' },
+      { label: 'Weddings & Evening Events', value: 'evening' },
+      { label: 'Gift for Someone Special', value: 'gift' }
+    ]
+  },
+  {
+    id: 'strength',
+    question: '2. How strong do you like your perfume?',
+    options: [
+      { label: 'Subtle & Gentle', value: 'subtle' },
+      { label: 'Moderate & Balanced', value: 'moderate' },
+      { label: 'Intense & Long Lasting', value: 'intense' }
+    ]
+  },
+  {
+    id: 'note',
+    question: '3. What is your preferred scent note?',
+    options: [
+      { label: 'Floral (Rose, Jasmine)', value: 'floral' },
+      { label: 'Woody (Oud, Sandalwood)', value: 'woody' },
+      { label: 'Sweet (Musk, Amber, Honey)', value: 'sweet' },
+      { label: 'Fresh (Citrus, White Musk)', value: 'fresh' }
+    ]
   }
 ];
 

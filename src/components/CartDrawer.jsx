@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { formatBDT } from '../utils/currency';
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
+import { validateCoupon } from '../data/coupons';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag, Check, AlertCircle } from 'lucide-react';
 
 /**
- * CartDrawer Component - ATOR ALI Store (Clean Light Theme)
+ * CartDrawer Component - ATOR ALI Store
  */
 export default function CartDrawer({
   isOpen,
@@ -16,7 +17,42 @@ export default function CartDrawer({
 }) {
   if (!isOpen) return null;
 
-  const totalBDT = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState('');
+
+  const itemsSubtotalBDT = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  const discountAmountBDT = appliedCoupon
+    ? Math.round((itemsSubtotalBDT * appliedCoupon.discountPercent) / 100)
+    : 0;
+
+  const finalTotalBDT = itemsSubtotalBDT - discountAmountBDT;
+
+  const handleApplyCoupon = (e) => {
+    e.preventDefault();
+    setCouponError('');
+
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    const matched = validateCoupon(couponCode);
+    if (matched) {
+      setAppliedCoupon(matched);
+      setCouponError('');
+    } else {
+      setAppliedCoupon(null);
+      setCouponError('Invalid coupon code. Try EID20 or WELCOME10');
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setCouponError('');
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -63,7 +99,6 @@ export default function CartDrawer({
                 key={item.id}
                 className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-gray-200 shadow-xs relative"
               >
-                {/* Product Image */}
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-50 shrink-0 border border-gray-100">
                   <img
                     src={item.image}
@@ -72,13 +107,11 @@ export default function CartDrawer({
                   />
                 </div>
 
-                {/* Details */}
                 <div className="flex-1 min-w-0 space-y-1">
                   <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
                     {item.title}
                   </h3>
 
-                  {/* BDT Price */}
                   <div className="flex items-baseline gap-2">
                     <span className="text-xs sm:text-sm font-extrabold text-black">
                       {formatBDT(item.price)}
@@ -90,7 +123,6 @@ export default function CartDrawer({
                     )}
                   </div>
 
-                  {/* Quantity controls */}
                   <div className="flex items-center gap-2 pt-1">
                     <div className="inline-flex items-center rounded-lg bg-gray-100 border border-gray-200 p-0.5">
                       <button
@@ -139,23 +171,77 @@ export default function CartDrawer({
 
         {/* Drawer Footer & Checkout Action */}
         {cartItems.length > 0 && (
-          <div className="p-4 sm:p-5 border-t border-gray-100 bg-gray-50 space-y-4">
+          <div className="p-4 sm:p-5 border-t border-gray-100 bg-gray-50 space-y-3">
+            {/* Coupon Code Section */}
+            <div className="space-y-1.5 bg-white p-3 rounded-2xl border border-gray-200">
+              <label className="block text-[11px] font-bold text-gray-700 uppercase flex items-center gap-1">
+                <Tag className="w-3.5 h-3.5 text-black" /> Coupon Discount
+              </label>
+
+              {!appliedCoupon ? (
+                <form onSubmit={handleApplyCoupon} className="flex gap-1.5">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    placeholder="Enter EID20 or WELCOME10"
+                    className="flex-1 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs uppercase font-bold text-gray-900 focus:outline-hidden focus:border-black"
+                  />
+                  <button
+                    type="submit"
+                    className="px-3 py-1.5 bg-black hover:bg-gray-800 text-white font-bold text-xs uppercase rounded-xl transition-colors cursor-pointer"
+                  >
+                    Apply
+                  </button>
+                </form>
+              ) : (
+                <div className="flex items-center justify-between bg-emerald-50 p-2 rounded-xl border border-emerald-200">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                    <Check className="w-4 h-4 text-emerald-600" />
+                    <span>{appliedCoupon.code} Applied ({appliedCoupon.discountPercent}% Off)</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-xs font-bold text-rose-600 hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+
+              {couponError && (
+                <p className="text-[10px] text-rose-600 font-semibold flex items-center gap-1 mt-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" /> {couponError}
+                </p>
+              )}
+            </div>
+
             {/* Order Totals Display */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center text-xs text-gray-600">
                 <span>Items Subtotal</span>
                 <span className="font-bold text-gray-900">
-                  {formatBDT(totalBDT)}
+                  {formatBDT(itemsSubtotalBDT)}
                 </span>
               </div>
+
+              {appliedCoupon && (
+                <div className="flex justify-between items-center text-xs text-emerald-700 font-bold">
+                  <span>Coupon Discount ({appliedCoupon.discountPercent}%)</span>
+                  <span>- {formatBDT(discountAmountBDT)}</span>
+                </div>
+              )}
+
               <div className="flex justify-between items-center text-xs text-gray-600">
                 <span>Estimated Shipping</span>
                 <span className="font-semibold text-emerald-600">Calculated at Checkout</span>
               </div>
+
               <div className="border-t border-gray-200 pt-2 flex justify-between items-baseline">
                 <span className="text-sm font-bold text-black">Total Amount</span>
                 <span className="text-xl font-extrabold text-black">
-                  {formatBDT(totalBDT)}
+                  {formatBDT(finalTotalBDT)}
                 </span>
               </div>
             </div>

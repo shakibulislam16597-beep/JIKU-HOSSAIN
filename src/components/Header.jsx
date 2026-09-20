@@ -1,21 +1,17 @@
 import React, { useState } from 'react';
-import { Menu, Search, X, User, Heart, Package, Phone, ChevronRight } from 'lucide-react';
+import { Menu, Search, X, Heart, Package, Phone, ChevronRight } from 'lucide-react';
+import AnnouncementBar from './AnnouncementBar';
 
 /**
  * Header Component - ATOR ALI (Clean Light Theme)
- *
- * Requirements:
- * - White, simple, no heavy border.
- * - Hamburger icon on the left
- * - ATOR ALI logo centered
- * - Search icon on the right (toggles full-width search bar)
  */
 export default function Header({
   cartCount = 0,
   onLogoClick,
   onCartClick,
   onToggleSearch,
-  isSearchOpen
+  isSearchOpen,
+  onOpenTrackOrder
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -28,6 +24,9 @@ export default function Header({
 
   return (
     <>
+      {/* Announcement Bar above Header */}
+      <AnnouncementBar />
+
       <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-100 transition-colors duration-200 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           {/* Left: Hamburger Menu */}
@@ -148,15 +147,10 @@ export default function Header({
                   </a>
                   <button
                     type="button"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-800 hover:bg-gray-100 transition-colors text-left cursor-pointer"
-                  >
-                    <Heart className="w-4 h-4 text-rose-500" />
-                    <span>My Wishlist</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      if (onOpenTrackOrder) onOpenTrackOrder();
+                    }}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-800 hover:bg-gray-100 transition-colors text-left cursor-pointer"
                   >
                     <Package className="w-4 h-4 text-gray-800" />

@@ -1,22 +1,15 @@
 import React from 'react';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Eye } from 'lucide-react';
 import { formatBDT } from '../utils/currency';
 
 /**
  * ProductCard Component - ATOR ALI (Clean Light Theme)
- *
- * Requirements:
- * - White card, thin light-gray border (border-gray-200), rounded-2xl, soft shadow.
- * - Square product image with dark-navy badge at top-left (e.g., "৳ 500 Off")
- * - Centered bold product title (max 2 lines)
- * - Centered price row (bold ৳ price + gray crossed-out old price)
- * - Full-width solid black rounded "Buy Now" button that adds to cart & opens checkout directly.
  */
-export default function ProductCard({ product, onBuyNow, onAddToCart }) {
+export default function ProductCard({ product, onBuyNow, onAddToCart, onQuickView }) {
   if (!product) return null;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-3 flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow duration-200 group">
+    <div className="bg-white border border-gray-200 rounded-2xl p-3 flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow duration-200 group relative">
       {/* Product Image Box */}
       <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-gray-50 mb-3 border border-gray-100">
         <img
@@ -26,22 +19,41 @@ export default function ProductCard({ product, onBuyNow, onAddToCart }) {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
 
-        {/* Dark-Navy Discount Badge Top-Left */}
+        {/* Top-Left Dark-Navy Discount Badge */}
         {product.badge && (
           <div className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md bg-[#0F172A] text-white text-[10px] font-bold tracking-tight shadow-xs">
             {product.badge}
           </div>
         )}
+
+        {/* Low Stock Urgency Badge */}
+        {product.stockCount && product.stockCount <= 3 && (
+          <div className="absolute bottom-2 left-2 z-10 px-2 py-0.5 rounded-md bg-rose-600 text-white text-[10px] font-extrabold shadow-xs">
+            Only {product.stockCount} left
+          </div>
+        )}
+
+        {/* Quick View Eye Icon Button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onQuickView) onQuickView(product);
+          }}
+          aria-label={`Quick view ${product.title}`}
+          className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-white/90 text-gray-700 hover:text-black hover:bg-white shadow-xs transition-transform hover:scale-110 cursor-pointer"
+        >
+          <Eye className="w-3.5 h-3.5" />
+        </button>
       </div>
 
       {/* Product Info */}
       <div className="flex flex-col items-center text-center flex-1 justify-between gap-2">
-        {/* Centered Title (max 2 lines) */}
         <h3 className="text-xs sm:text-sm font-bold text-gray-900 line-clamp-2 leading-tight">
           {product.title}
         </h3>
 
-        {/* Centered Price Row */}
+        {/* Price Row */}
         <div className="flex items-center justify-center gap-2 flex-wrap">
           <span className="text-sm sm:text-base font-extrabold text-black">
             {formatBDT(product.price)}
@@ -53,7 +65,7 @@ export default function ProductCard({ product, onBuyNow, onAddToCart }) {
           )}
         </div>
 
-        {/* Full-width Solid Black Rounded "Buy Now" Button */}
+        {/* Buy Now Action */}
         <button
           type="button"
           onClick={() => onBuyNow && onBuyNow(product)}

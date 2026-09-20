@@ -1,0 +1,21 @@
+{
+  "name": "ATOR ALI Perfumery",
+  "short_name": "ATOR ALI",
+  "description": "Premium Bangladeshi E-Commerce for Attars, Oud and Perfumes",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "./assets/hero-banner-DZIdyqBf.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "./assets/hero-banner-DZIdyqBf.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
