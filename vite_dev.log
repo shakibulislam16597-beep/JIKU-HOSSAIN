@@ -7,3 +7,8 @@
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: http://192.168.0.2:3000/  eth0
+2:57:05 PM [vite] (client) hmr update /src/index.css
+2:57:10 PM [vite] (client) hmr update /src/components/SplashScreen.jsx, /src/index.css
+2:57:43 PM [vite] (client) hmr update /src/index.css, /src/components/Header.jsx
+2:58:23 PM [vite] (client) hmr update /src/index.css, /src/components/SearchBar.jsx
+2:59:10 PM [vite] (client) hmr update /src/components/Home.jsx, /src/index.css

@@ -13,23 +13,33 @@
     }
   }
 
+  /* Keyframe animation for shimmer skeleton loading */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
   .animate-splash {
     animation: splashFadeInScale 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 }
 
-/* Custom scrollbar styling */
+/* Custom scrollbar styling in luxury black & gold theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #0B0B0B;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.4);
+  background: rgba(212, 175, 55, 0.3);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.6);
+  background: rgba(212, 175, 55, 0.6);
 }
