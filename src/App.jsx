@@ -93,7 +93,7 @@ export default function App() {
       {showSplash ? (
         <SplashScreen onFinish={handleSplashFinish} />
       ) : (
-        <Home onResetSplash={handleResetSplash} />
+        <Home onResetSplash={handleResetSplash} isAdmin={user && isAdminActive} />
       )}
     </div>
   );

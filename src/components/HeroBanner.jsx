@@ -110,7 +110,7 @@ export default function HeroBanner({ onShopNowClick }) {
           </div>
 
           {/* Text Content */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8 flex flex-col items-start z-10">
+          <div className="absolute bottom-0 left-0 right-0 px-[56px] sm:px-[56px] md:px-[56px] pb-4 pt-4 sm:pb-6 md:pb-8 flex flex-col items-start z-10">
             <span className="inline-block px-3 py-1 mb-2 rounded-full bg-[#FFC933] border border-[#0E1330] text-[10px] font-extrabold text-[#0E1330] uppercase tracking-wider">
               {slide.badge}
             </span>
