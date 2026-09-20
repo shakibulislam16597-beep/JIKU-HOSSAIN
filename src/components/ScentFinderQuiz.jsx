@@ -7,7 +7,7 @@ import { Sparkles, RotateCcw, ShoppingBag, ArrowRight, Check } from 'lucide-reac
 /**
  * ScentFinderQuiz Component - Extrovat Lifestyle
  */
-export default function ScentFinderQuiz({ onAddToCart }) {
+export default function ScentFinderQuiz({ onAddToCart, products = MOCK_PRODUCTS }) {
   const [answers, setAnswers] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [showResults, setShowResults] = useState(false);
@@ -29,8 +29,10 @@ export default function ScentFinderQuiz({ onAddToCart }) {
     setShowResults(false);
   };
 
+  const productsList = Array.isArray(products) && products.length > 0 ? products : MOCK_PRODUCTS;
+
   // Recommendations based on quiz answers
-  const recommendedProducts = MOCK_PRODUCTS.filter((p) => {
+  const recommendedProducts = productsList.filter((p) => {
     if (answers.note && p.note === answers.note) return true;
     if (answers.strength && p.strength === answers.strength) return true;
     if (answers.occasion && p.occasion === answers.occasion) return true;
@@ -108,7 +110,7 @@ export default function ScentFinderQuiz({ onAddToCart }) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {(recommendedProducts.length > 0 ? recommendedProducts : MOCK_PRODUCTS.slice(0, 3)).map((prod) => (
+            {(recommendedProducts.length > 0 ? recommendedProducts : productsList.slice(0, 3)).map((prod) => (
               <div
                 key={prod.id}
                 className="bg-[#F7F8FC] p-3 rounded-xl border-2 border-[#0E1330] flex flex-col justify-between"

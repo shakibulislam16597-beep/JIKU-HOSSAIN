@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import AdminDashboard from './AdminDashboard';
+import AllProducts from './AllProducts';
+import ProductForm from './ProductForm';
+import CategoriesManager from './CategoriesManager';
+import BrandsManager from './BrandsManager';
+import ReviewsManager from './ReviewsManager';
 import ComingSoon from './ComingSoon';
 
 import {
@@ -193,6 +198,26 @@ export default function AdminLayout({ currentHash, user }) {
   const renderMainContent = () => {
     if (currentHash === '#/admin/dashboard' || currentHash === '#/admin' || currentHash === '#/admin/') {
       return <AdminDashboard />;
+    }
+
+    if (currentHash === '#/admin/products') {
+      return <AllProducts />;
+    }
+
+    if (currentHash === '#/admin/products/new' || currentHash.startsWith('#/admin/products/edit')) {
+      return <ProductForm />;
+    }
+
+    if (currentHash === '#/admin/categories') {
+      return <CategoriesManager />;
+    }
+
+    if (currentHash === '#/admin/brands') {
+      return <BrandsManager />;
+    }
+
+    if (currentHash === '#/admin/reviews') {
+      return <ReviewsManager />;
     }
 
     // Find title match from nav groups

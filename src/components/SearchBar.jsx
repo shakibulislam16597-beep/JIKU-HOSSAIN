@@ -6,7 +6,7 @@ import { formatBDT } from '../utils/currency';
 /**
  * SearchBar Component - ATOR ALI (Clean White Modern Theme)
  */
-export default function SearchBar({ onSearchSubmit, onSelectProduct, autoFocus = false }) {
+export default function SearchBar({ onSearchSubmit, onSelectProduct, autoFocus = false, products = MOCK_PRODUCTS }) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isFocused, setIsFocused] = useState(autoFocus);
@@ -46,10 +46,12 @@ export default function SearchBar({ onSearchSubmit, onSelectProduct, autoFocus =
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const suggestionsList = Array.isArray(products) && products.length > 0 ? products : MOCK_PRODUCTS;
+
   const suggestions = debouncedQuery.length > 0
-    ? MOCK_PRODUCTS.filter((prod) =>
-        prod.title.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
-        prod.category.toLowerCase().includes(debouncedQuery.toLowerCase())
+    ? suggestionsList.filter((prod) =>
+        (prod.title || prod.name || '').toLowerCase().includes(debouncedQuery.toLowerCase()) ||
+        (prod.category || prod.categoryName || '').toLowerCase().includes(debouncedQuery.toLowerCase())
       )
     : [];
 
