@@ -3,10 +3,130 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Extrovat Lifestyle | Attars, Perfumes & Lifestyle</title>
+    <title>Extrovat Lifestyle | Attars, Perfumes &amp; Lifestyle</title>
+    <script>
+      (function() {
+        // Ensure base URL is correctly scoped even if loaded without trailing slash
+        var p = window.location.pathname;
+        if (p && p.length > 1 && !p.endsWith('/') && !/\.[a-z0-9]+$/i.test(p)) {
+          var base = document.createElement('base');
+          base.href = p + '/';
+          document.head.appendChild(base);
+        }
+
+        function escapeHtml(str) {
+          return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+
+        function renderDiagnosticError(title, message, file, line, col, stack) {
+          function render() {
+            if (!document.body) return;
+            if (document.getElementById('startup-diagnostic-error')) return;
+            var box = document.createElement('div');
+            box.id = 'startup-diagnostic-error';
+            box.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:9999999; background:#FEF2F2; color:#0E1330; border:2px solid #EF4444; border-radius:12px; margin:12px; padding:16px; font-family:system-ui,-apple-system,sans-serif; font-size:13px; box-shadow:0 8px 24px rgba(0,0,0,0.2); box-sizing:border-box; max-height:90vh; overflow-y:auto;';
+
+            var html = '<div style="font-weight:800; font-size:16px; color:#DC2626; margin-bottom:8px; border-bottom:1px solid #FCA5A5; padding-bottom:6px;">' + escapeHtml(title) + '</div>';
+            if (message) html += '<div style="font-weight:700; margin-bottom:4px;">Error Details:</div><pre style="margin:0 0 8px 0; font-family:monospace; font-size:12px; color:#991B1B; white-space:pre-wrap; word-break:break-word; background:#FFFFFF; padding:8px; border-radius:6px; border:1px solid #FECACA;">' + escapeHtml(message) + '</pre>';
+            if (file) html += '<div style="font-size:11px; color:#4B5563; margin-bottom:4px;"><strong>File:</strong> ' + escapeHtml(file) + (line ? ' (Line: ' + line + (col ? ', Col: ' + col : '') + ')' : '') + '</div>';
+            if (stack) html += '<div style="font-weight:700; margin-bottom:4px;">Stack Trace:</div><pre style="margin:0 0 12px 0; font-family:monospace; font-size:10px; color:#374151; white-space:pre-wrap; word-break:break-word; background:#F3F4F6; padding:8px; border-radius:6px; border:1px solid #E5E7EB; max-height:150px; overflow-y:auto;">' + escapeHtml(stack) + '</pre>';
+            html += '<button onclick="window.location.reload()" style="background:#2436F5; color:#FFFFFF; border:none; padding:10px 18px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer;">Reload</button>';
+
+            box.innerHTML = html;
+            document.body.prepend(box);
+          }
+
+          if (document.body) {
+            render();
+          } else {
+            document.addEventListener('DOMContentLoaded', render);
+          }
+        }
+
+        // (a) Global window error handlers
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+          var stack = error && error.stack ? error.stack : '';
+          renderDiagnosticError('JavaScript Uncaught Error', msg, url, lineNo, columnNo, stack);
+          return false;
+        };
+
+        window.onunhandledrejection = function(event) {
+          var reason = event ? event.reason : null;
+          var msg = reason ? (reason.message || String(reason)) : 'Unhandled Promise Rejection';
+          var stack = reason && reason.stack ? reason.stack : '';
+          renderDiagnosticError('Unhandled Promise Rejection', msg, '', '', '', stack);
+        };
+
+        // Capture-phase "error" listener catching failed <script> and <link> loads
+        window.addEventListener('error', function(event) {
+          var target = event.target || event.srcElement;
+          if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK' || target.tagName === 'IMG')) {
+            var src = target.src || target.href || 'unknown asset';
+            var tag = target.tagName.toLowerCase();
+            renderDiagnosticError('Asset Load Failure', 'Failed to load <' + tag + '> element: ' + src, src, '', '', '');
+          }
+        }, true);
+
+        // (b) Unregister every service worker and delete every Cache Storage entry
+        if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (var i = 0; i < registrations.length; i++) {
+              registrations[i].unregister().catch(function() {});
+            }
+          }).catch(function() {});
+        }
+
+        if (typeof window !== 'undefined' && 'caches' in window) {
+          caches.keys().then(function(names) {
+            for (var i = 0; i < names.length; i++) {
+              caches.delete(names[i]).catch(function() {});
+            }
+          }).catch(function() {});
+        }
+
+        // (c) 4-second timeout check for root fallback text
+        setTimeout(function() {
+          var rootEl = document.getElementById('root');
+          if (rootEl && rootEl.innerText && rootEl.innerText.indexOf('Loading...') !== -1) {
+            var mainScript = document.querySelector('script[type="module"]');
+            var scriptSrc = mainScript ? mainScript.getAttribute('src') : 'unknown';
+            var currentUrl = window.location.href;
+
+            renderDiagnosticError(
+              'The app script did not run',
+              'The application script did not execute or mount within 4 seconds.\n\nScript Src: ' + scriptSrc + '\nCurrent URL: ' + currentUrl,
+              scriptSrc,
+              '',
+              '',
+              'Current URL: ' + currentUrl
+            );
+          }
+        }, 4000);
+      })();
+    </script>
   </head>
   <body class="h-full bg-[#F7F8FC] text-[#0E1330] antialiased selection:bg-[#2436F5] selection:text-white">
-    <div id="root" class="min-h-full flex flex-col"></div>
+    <div id="root" class="min-h-full flex flex-col">
+      <div style="min-height: 100vh; background-color: #F7F8FC; color: #0E1330; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; box-sizing: border-box;">
+        <div style="background-color: #FFFFFF; border: 2px solid #0E1330; border-radius: 20px; box-shadow: 4px 4px 0px #0E1330; padding: 32px 24px; max-width: 360px; width: 100%; box-sizing: border-box;">
+          <h1 style="font-size: 22px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.5px; color: #0E1330;">Extrovat Lifestyle</h1>
+          <p style="font-size: 13px; font-weight: 600; color: #2436F5; margin: 0 0 16px 0;">Attars, Perfumes &amp; Lifestyle</p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; color: #5B6079;">
+            <div style="width: 14px; height: 14px; border: 2px solid #2436F5; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <span>Loading...</span>
+          </div>
+          <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+          <div style="margin-top: 20px; font-size: 10px; color: #888888; border-top: 1px solid #E5E7EB; padding-top: 10px;" id="fallback-build-stamp">
+            Build: __BUILD_TIME__
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="./src/main.jsx"></script>
   </body>
 </html>

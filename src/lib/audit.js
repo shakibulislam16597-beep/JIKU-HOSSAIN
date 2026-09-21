@@ -12,6 +12,7 @@ import { db, auth } from './firebase';
  */
 export async function logAction(action, target, details = {}) {
   try {
+    if (!db) return;
     const currentUser = auth?.currentUser;
     const adminUid = currentUser?.uid || 'system';
     const email = currentUser?.email || 'unknown@extrovat.com';

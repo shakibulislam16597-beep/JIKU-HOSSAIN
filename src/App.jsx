@@ -26,6 +26,13 @@ export default function App() {
 
   // Firebase auth state listener + admins/{uid} check with full error catch resilience
   useEffect(() => {
+    if (!auth || !db) {
+      setUser(null);
+      setIsAdminActive(false);
+      setAuthChecking(false);
+      return;
+    }
+
     let unsubscribe = () => {};
     try {
       unsubscribe = onAuthStateChanged(
