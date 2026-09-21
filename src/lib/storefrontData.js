@@ -87,6 +87,9 @@ export async function getStorefrontData() {
 
   // Attempt Firestore fetch
   try {
+    if (!db) {
+      throw new Error('Firestore db is null or not initialized');
+    }
     const productsRef = collection(db, 'products');
     let fetchedProducts = [];
 
@@ -193,6 +196,7 @@ export async function getStorefrontData() {
  */
 export async function getApprovedReviews(productId) {
   try {
+    if (!db) return [];
     const reviewsRef = collection(db, 'reviews');
     const q = query(reviewsRef, where('status', '==', 'approved'));
     const snap = await getDocs(q);
